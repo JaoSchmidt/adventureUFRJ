@@ -1,4 +1,5 @@
 //COMPILAR: gcc c.c -o c -Wall -lncurses
+////
 #include <stdio.h>
 #include <ncurses.h>
 #include <unistd.h>
@@ -6,9 +7,9 @@
 
 typedef struct estrutura_jogador{
     int x,y,tiro,tirox,tiroy;
-} jogador;
+} jogador; /// usaremos p como jogador
 
-jogador limite(jogador p,int altura,int largura)
+jogador limiteDeTela(jogador p,int altura,int largura) 
 {
     if(p.y>altura)p.y=0;
     if(p.x>largura-3)p.x=0;
@@ -17,13 +18,13 @@ jogador limite(jogador p,int altura,int largura)
     return p;
 }
 
-void desenhaplayer(jogador p,int num)
+void desenhaPlayer(jogador p,int num)
 {
     mvprintw(0,p.x,"X%d Y%d",p.x,p.y);
     mvprintw(p.y,p.x,"\\%d/",num);
 }
 
-jogador desenhatiro(jogador p,int largura)
+jogador desenhaTiro(jogador p,int largura) 
 {
     mvprintw(p.tiroy,p.tirox,"0");
     if(p.tirox>=largura)p.tiro=0;
@@ -55,15 +56,15 @@ int main()
     if(c=='5'){p2.y++;}
     if(c=='6'){p2.x+=2;}
     if(c=='0'){p2.tiro=1;}
-    p1=limite(p1,altura,largura);
-    p2=limite(p2,altura,largura);
+    p1=limiteDeTela(p1,altura,largura);
+    p2=limiteDeTela(p2,altura,largura);
     clear();
     attron(COLOR_PAIR(1));
-    desenhaplayer(p1,1);
+    desenhaPlayer(p1,1);
     attron(COLOR_PAIR(2));
-    desenhaplayer(p2,2);
+    desenhaPlayer(p2,2);
     attron(COLOR_PAIR(3));
-    if(p1.tiro)p1=desenhatiro(p1,largura);
+    if(p1.tiro)p1=desenhaTiro(p1,largura);
     usleep(10000); 
     move(0,0);
     }
