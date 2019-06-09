@@ -1,0 +1,216 @@
+//COMPILAR: gcc c.c -o c -Wall -lncurses
+//VERSIONBETA7.1
+#include <stdio.h>
+#include <ncurses.h>
+#include <unistd.h>
+#include <time.h>
+#define qinimigos 4
+
+typedef struct estrutura_jogador{ //estrutura para jogador
+    int x,y;//cordenadas do cara
+    int direcao;//direção da seta presa no jogador;
+    int qtirosdireita,qtirosesquerda,qtiroscima,qtirosbaixo;//q indica quantidade de tiros em cada direção
+    int tirodireitax[50],tirodireitay[50];//cada tiro possui um x e y, el
+    int tiroesquerdax[50],tiroesquerday[50];
+    int tirocimax[50],tirocimay[50];
+    int tirobaixox[50],tirobaixoy[50];
+} jogador;
+
+typedef struct estrutura_inimigo{ //estrutura para inimigo
+    int x,y; //coordenadas do inimigo
+    int tempo; //essa flag vai controlar a velocidade do inimigo (indiretamente)
+    int vivo; //essa flag indica se o bicho está vivo (bool)
+} inimigo;
+
+jogador inicializajogador(jogador p)
+{
+    p.x=0;p.y=0;
+    p.qtirosdireita=0;
+    p.qtirosesquerda=0;
+    p.qtirosbaixo=0;
+    p.qtiroscima=0;
+    p.direcao='>';
+    return p;
+}
+
+inimigo inicializainimigo(inimigo i,int cont,int altura,int largura){
+    i.tempo=cont*3;i.vivo=1; //cada um nasce com o tempo diferente
+    if(cont==0)i.x=0;i.y=0;
+    if(cont==1)i.x=20;i.y=0;
+    if(cont==2)i.x=40;i.y=altura-1;
+    if(cont==3)i.x=60;i.y=altura-1;
+    return i;
+}
+
+jogador limite(jogador p,int altura,int largura){// limite de tela. Se o player passar, volta do outro lado
+    if(p.y>altura)p.y=0;
+    if(p.x>largura-3)p.x=0;
+    if(p.y<0)p.y=altura;
+    if(p.x<0)p.x=largura-3;
+    if(p.qtirosdireita>50)p.qtirosdireita=0;
+    if(p.qtirosesquerda>50)p.qtirosesquerda=0;
+    if(p.qtiroscima>50)p.qtiroscima=0;
+    if(p.qtirosbaixo>50)p.qtirosbaixo=0;
+    return p;
+}
+
+jogador direcaodotiro(jogador p){
+    if(p.direcao=='^'){//tiroacimax eh função
+        p.tirocimax[p.qtiroscima]=p.x+1;//esses dois fazem o tiro surgir nas coord do player
+        p.tirocimay[p.qtiroscima]=p.y-2;//y-1,x-2,x+1,etc dizem sobre a posição que o tiro surge em função do tamanho do personagem, lembrando que ele é "\O/"
+        p.qtiroscima++;// aumenta quantidade de tiros em 1
+    }
+    if(p.direcao=='<'){
+        p.tiroesquerdax[p.qtirosesquerda]=p.x-3;
+        p.tiroesquerday[p.qtirosesquerda]=p.y;
+        p.qtirosesquerda++;
+    }
+    if(p.direcao=='v'){
+        p.tirobaixox[p.qtirosbaixo]=p.x+1;
+        p.tirobaixoy[p.qtirosbaixo]=p.y+2;
+        p.qtirosbaixo++;
+    }
+    if(p.direcao=='>'){
+        p.tirodireitax[p.qtirosdireita]=p.x+5;
+        p.tirodireitay[p.qtirosdireita]=p.y;
+        p.qtirosdireita++;
+    }
+    return p;
+}
+
+jogador controle1(jogador p,int c){ //aqui é onde ocorre o controle do player 1;
+    if(c=='w'){p.y--;p.direcao='^';}
+    if(c=='a'){p.x-=2;p.direcao='<';}
+    if(c=='s'){p.y++;p.direcao='v';}
+    if(c=='d'){p.x+=2;p.direcao='>';}
+    if(c==32)p=direcaodotiro(p);//barra de espaço
+    return p;
+}
+
+jogador controle2(jogador p,int c){ //aqui é onde ocorre o controle do player 2;
+    if(c=='8'){p.y--;p.direcao='^';}
+    if(c=='4'){p.x-=2;p.direcao='<';}
+    if(c=='5'){p.y++;p.direcao='v';}
+    if(c=='6'){p.x+=2;p.direcao='>';}
+    if(c=='0')p=direcaodotiro(p);//barra de espaço
+    return p;
+}
+
+void desenhaplayer(jogador p,int num){//desenha o jogador no terminal
+    mvprintw(p.y,p.x,"\\%d/",num);
+    //print das setas q acompanham cada player
+    if(p.direcao=='^')
+    mvprintw(p.y-1,p.x+1,"^",num);
+    if(p.direcao=='<')
+    mvprintw(p.y,p.x-2,"<",num);
+    if(p.direcao=='v')
+    mvprintw(p.y+1,p.x+1,"v",num);
+    if(p.direcao=='>')
+    mvprintw(p.y,p.x+4,">",num);
+    return;
+}
+
+jogador desenhatiro(jogador p){// desenha tiros no terminal
+    int cont;
+    for(cont=0;cont<p.qtiroscima;cont++){
+        mvprintw(p.tirocimay[cont],p.tirocimax[cont],"^");
+        p.tirocimay[cont]--;
+    }
+    for(cont=0;cont<p.qtirosesquerda;cont++){
+        mvprintw(p.tiroesquerday[cont],p.tiroesquerdax[cont],"<");
+        p.tiroesquerdax[cont]-=2;
+    }
+    for(cont=0;cont<p.qtirosbaixo;cont++){
+        mvprintw(p.tirobaixoy[cont],p.tirobaixox[cont],"v");
+        p.tirobaixoy[cont]++;
+    }
+    for(cont=0;cont<p.qtirosdireita;cont++){
+        mvprintw(p.tirodireitay[cont],p.tirodireitax[cont],">");
+        p.tirodireitax[cont]+=2;
+    }
+    return p;
+}
+
+inimigo controleinimigo(inimigo i,jogador p){
+    if(i.x>p.x)i.x-=2;
+    if(i.x<p.x)i.x+=2;
+    if(i.y>p.y)i.y--;
+    if(i.y<p.y)i.y++;
+    return i;
+}
+
+void desenhainimigo(inimigo i,int num){
+    mvprintw(0,i.x,"%d %d",i.x,i.y);
+    if(i.vivo==1)
+    mvprintw(i.y,i.x,"\\%d/",num);
+}
+
+inimigo colisaotiro(jogador p,inimigo i){
+    int cont;
+    for(cont=0;cont<p.qtiroscima;cont++)
+    if(p.tirocimax[cont]==i.x+1&&p.tirocimay[cont]==i.y)
+    i.vivo=0;
+    for(cont=0;cont<p.qtirosesquerda;cont++)
+    if(p.tiroesquerdax[cont]==i.x+1&&p.tiroesquerday[cont]==i.y)
+    i.vivo=0;
+    for(cont=0;cont<p.qtirosbaixo;cont++)
+    if(p.tirobaixox[cont]==i.x+1&&p.tirobaixoy[cont]==i.y)
+    i.vivo=0;
+    for(cont=0;cont<p.qtirosdireita;cont++)
+    if(p.tirodireitax[cont]==i.x+1&&p.tirodireitay[cont]==i.y)
+    i.vivo=0;
+    return i;
+}
+
+int main()
+{
+    int c=0,altura,largura,qplayers,cont,cont2;
+    printf("Insira a qnt de jogadores: ");
+    scanf("%d",&qplayers);
+    initscr();
+    cbreak();
+    noecho();
+	curs_set(FALSE);
+    getmaxyx(stdscr,altura,largura);
+    largura=largura-1;
+    altura=altura-1;
+    nodelay(stdscr,TRUE);
+    start_color();
+    init_pair(1,COLOR_GREEN,COLOR_BLACK);
+    init_pair(2,COLOR_BLUE,COLOR_BLACK);
+    init_pair(3,COLOR_WHITE,COLOR_BLACK);
+    init_pair(4,COLOR_RED,COLOR_BLACK);
+    jogador p[qplayers];
+    inimigo i[qinimigos];
+    p[0]=inicializajogador(p[0]);
+    if(qplayers==2)inicializajogador(p[1]);
+    for(cont=0;cont<qinimigos;cont++)
+    i[cont]=inicializainimigo(i[cont],cont,altura,largura);
+    while(c!=127){//loop de tempo, conforme o comando passa, o jogo resume.
+    c=getch();
+    p[0]=controle1(p[0],c);
+    if(qplayers==2) p[1]=controle2(p[1],c);
+    p[0]=limite(p[0],altura,largura);
+    if(qplayers==2)p[1]=limite(p[1],altura,largura);
+    clear();
+    attron(COLOR_PAIR(1));
+    desenhaplayer(p[0],1);
+    attron(COLOR_PAIR(2));
+    if(qplayers==2) desenhaplayer(p[1],2);
+    attron(COLOR_PAIR(4));
+    for(cont=0;cont<qinimigos;cont++){
+    if(i[cont].tempo%15==0)
+    i[cont]=controleinimigo(i[cont],p[0]);//esse numero indica quantos ticks levam pros bots se mexerem
+    desenhainimigo(i[cont],cont);
+    i[cont].tempo++;}
+    attron(COLOR_PAIR(3));
+    p[0]=desenhatiro(p[0]);
+    if(qplayers==2)p[1]=desenhatiro(p[1]);
+    for(cont2=0;cont2<qplayers;cont2++)
+    for(cont=0;cont<qinimigos;cont++)
+    i[cont]=colisaotiro(p[cont2],i[cont]);
+    usleep(55000);
+    }
+    endwin();
+    return 0;
+}
