@@ -1,14 +1,16 @@
 //COMPILAR: gcc c.c -o c -Wall -lncurses
-//VERSIONBETA7.1
+//VERSIONBETA7.2
+//ESSE PROGRAMA NÃO USA VARIÁVEIS GLOBAIS AFIM DE GARANTIR PORTABILIDADE
 #include <stdio.h>
 #include <ncurses.h>
 #include <unistd.h>
 #include <time.h>
-#define qinimigos 4
+#define qinimigos 20
 
 typedef struct estrutura_jogador{ //estrutura para jogador
     int x,y;//cordenadas do cara
-    int direcao;//direção da seta presa no jogador;
+    unsigned short int direcao;//direção da seta presa no jogador;
+    unsigned short int tirodisponivel; //essa flag impede que o jogador segure o tiro
     int qtirosdireita,qtirosesquerda,qtiroscima,qtirosbaixo;//q indica quantidade de tiros em cada direção
     int tirodireitax[50],tirodireitay[50];//cada tiro possui um x e y, el
     int tiroesquerdax[50],tiroesquerday[50];
@@ -18,8 +20,8 @@ typedef struct estrutura_jogador{ //estrutura para jogador
 
 typedef struct estrutura_inimigo{ //estrutura para inimigo
     int x,y; //coordenadas do inimigo
-    int tempo; //essa flag vai controlar a velocidade do inimigo (indiretamente)
-    int vivo; //essa flag indica se o bicho está vivo (bool)
+    unsigned short int tempo; //essa flag vai controlar a velocidade do inimigo (indiretamente)
+    unsigned short int vivo; //essa flag indica se o bicho está vivo (bool)
 } inimigo;
 
 jogador inicializajogador(jogador p)
@@ -30,15 +32,13 @@ jogador inicializajogador(jogador p)
     p.qtirosbaixo=0;
     p.qtiroscima=0;
     p.direcao='>';
+    p.tirodisponivel=0;
     return p;
 }
 
 inimigo inicializainimigo(inimigo i,int cont,int altura,int largura){
-    i.tempo=cont*3;i.vivo=1; //cada um nasce com o tempo diferente
-    if(cont==0)i.x=0;i.y=0;
-    if(cont==1)i.x=20;i.y=0;
-    if(cont==2)i.x=40;i.y=altura-1;
-    if(cont==3)i.x=60;i.y=altura-1;
+    i.tempo=0;i.vivo=1; //cada um nasce com o tempo diferente
+    i.x=20*cont;i.y=altura;
     return i;
 }
 
@@ -51,6 +51,7 @@ jogador limite(jogador p,int altura,int largura){// limite de tela. Se o player 
     if(p.qtirosesquerda>50)p.qtirosesquerda=0;
     if(p.qtiroscima>50)p.qtiroscima=0;
     if(p.qtirosbaixo>50)p.qtirosbaixo=0;
+    if(p.tirodisponivel<5)p.tirodisponivel++;
     return p;
 }
 
@@ -79,11 +80,15 @@ jogador direcaodotiro(jogador p){
 }
 
 jogador controle1(jogador p,int c){ //aqui é onde ocorre o controle do player 1;
+    int cont;
     if(c=='w'){p.y--;p.direcao='^';}
     if(c=='a'){p.x-=2;p.direcao='<';}
     if(c=='s'){p.y++;p.direcao='v';}
     if(c=='d'){p.x+=2;p.direcao='>';}
-    if(c==32)p=direcaodotiro(p);//barra de espaço
+    if(c==32)if(p.tirodisponivel==5){
+        p=direcaodotiro(p);//barra de espaço
+        p.tirodisponivel=0;
+    }
     return p;
 }
 
@@ -92,13 +97,15 @@ jogador controle2(jogador p,int c){ //aqui é onde ocorre o controle do player 2
     if(c=='4'){p.x-=2;p.direcao='<';}
     if(c=='5'){p.y++;p.direcao='v';}
     if(c=='6'){p.x+=2;p.direcao='>';}
-    if(c=='0')p=direcaodotiro(p);//barra de espaço
+    if(c=='0')if(p.tirodisponivel==5){
+        p=direcaodotiro(p);
+        p.tirodisponivel=0;
+    }
     return p;
 }
 
-void desenhaplayer(jogador p,int num){//desenha o jogador no terminal
-    mvprintw(p.y,p.x,"\\%d/",num);
-    //print das setas q acompanham cada player
+void desenhaplayer(jogador p,int num){ //desenha o jogador no terminal
+    mvprintw(p.y,p.x,"\\%d/",num); //print das setas q acompanham cada player
     if(p.direcao=='^')
     mvprintw(p.y-1,p.x+1,"^",num);
     if(p.direcao=='<')
@@ -134,31 +141,32 @@ jogador desenhatiro(jogador p){// desenha tiros no terminal
 inimigo controleinimigo(inimigo i,jogador p){
     if(i.x>p.x)i.x-=2;
     if(i.x<p.x)i.x+=2;
+    if(i.x==p.x){
     if(i.y>p.y)i.y--;
     if(i.y<p.y)i.y++;
+    }
     return i;
 }
 
 void desenhainimigo(inimigo i,int num){
-    mvprintw(0,i.x,"%d %d",i.x,i.y);
     if(i.vivo==1)
     mvprintw(i.y,i.x,"\\%d/",num);
 }
 
-inimigo colisaotiro(jogador p,inimigo i){
+inimigo colisaotiro(jogador p,inimigo i){ //aqui encontrei um problema pois era necessario retornar dois valores: p e i
     int cont;
-    for(cont=0;cont<p.qtiroscima;cont++)
-    if(p.tirocimax[cont]==i.x+1&&p.tirocimay[cont]==i.y)
-    i.vivo=0;
+    for(cont=0;cont<p.qtiroscima;cont++) //para resolver esse tipo de problema, normalmente eu criaria um struct, mas esses dois valores eram structs!
+    if(p.tirocimax[cont]==i.x+1&&p.tirocimay[cont]==i.y&&i.vivo==1){ 
+    i.vivo=0;}
     for(cont=0;cont<p.qtirosesquerda;cont++)
-    if(p.tiroesquerdax[cont]==i.x+1&&p.tiroesquerday[cont]==i.y)
-    i.vivo=0;
+    if(p.tiroesquerdax[cont]==i.x+1&&p.tiroesquerday[cont]==i.y&&i.vivo==1){
+    i.vivo=0;}
     for(cont=0;cont<p.qtirosbaixo;cont++)
-    if(p.tirobaixox[cont]==i.x+1&&p.tirobaixoy[cont]==i.y)
-    i.vivo=0;
+    if(p.tirobaixox[cont]==i.x+1&&p.tirobaixoy[cont]==i.y&&i.vivo==1){
+    i.vivo=0;}
     for(cont=0;cont<p.qtirosdireita;cont++)
-    if(p.tirodireitax[cont]==i.x+1&&p.tirodireitay[cont]==i.y)
-    i.vivo=0;
+    if(p.tirodireitax[cont]==i.x+1&&p.tirodireitay[cont]==i.y&&i.vivo==1){
+    i.vivo=0;}
     return i;
 }
 
@@ -180,6 +188,7 @@ int main()
     init_pair(2,COLOR_BLUE,COLOR_BLACK);
     init_pair(3,COLOR_WHITE,COLOR_BLACK);
     init_pair(4,COLOR_RED,COLOR_BLACK);
+    attron(A_BOLD);
     jogador p[qplayers];
     inimigo i[qinimigos];
     p[0]=inicializajogador(p[0]);
@@ -188,6 +197,8 @@ int main()
     i[cont]=inicializainimigo(i[cont],cont,altura,largura);
     while(c!=127){//loop de tempo, conforme o comando passa, o jogo resume.
     c=getch();
+    if(c=='r')for(cont=0;cont<qinimigos;cont++)
+    i[cont]=inicializainimigo(i[cont],cont,altura,largura);
     p[0]=controle1(p[0],c);
     if(qplayers==2) p[1]=controle2(p[1],c);
     p[0]=limite(p[0],altura,largura);
@@ -199,17 +210,20 @@ int main()
     if(qplayers==2) desenhaplayer(p[1],2);
     attron(COLOR_PAIR(4));
     for(cont=0;cont<qinimigos;cont++){
-    if(i[cont].tempo%15==0)
-    i[cont]=controleinimigo(i[cont],p[0]);//esse numero indica quantos ticks levam pros bots se mexerem
+    if(i[cont].tempo==7){ //esse numero indica quantos ticks levam pros bots se mexerem
+    i[cont]=controleinimigo(i[cont],p[0]); 
+    i[cont].tempo=0;
+    }
     desenhainimigo(i[cont],cont);
-    i[cont].tempo++;}
+    i[cont].tempo++;
+    }
     attron(COLOR_PAIR(3));
     p[0]=desenhatiro(p[0]);
     if(qplayers==2)p[1]=desenhatiro(p[1]);
-    for(cont2=0;cont2<qplayers;cont2++)
+    for(cont2=0;cont2<qplayers;cont2++) //roda o(s) doi(s) jogadores pela função de colisão 
     for(cont=0;cont<qinimigos;cont++)
     i[cont]=colisaotiro(p[cont2],i[cont]);
-    usleep(55000);
+    usleep(50000);
     }
     endwin();
     return 0;
