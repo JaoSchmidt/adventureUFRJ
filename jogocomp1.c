@@ -38,7 +38,7 @@ jogador inicializajogador(jogador p)
 
 inimigo inicializainimigo(inimigo i,int cont,int altura,int largura){
     i.tempo=cont;i.vivo=1; //cada um nasce com o tempo diferente
-    i.x=5*cont;i.y=altura;
+    i.x=2*cont;i.y=altura;
     return i;
 }
 
@@ -155,23 +155,23 @@ void desenhainimigo(inimigo i){
         mvprintw(i.y,i.x,"\\o/");
 }
 
-inimigo colisaotiro(jogador p,inimigo i){ //aqui encontrei um problema pois era necessario retornar dois valores: p e i
+inimigo colisaotiro(jogador p,inimigo i){ 
     int cont;
-    for(cont=0;cont<p.qtiroscima;cont++) //para resolver esse tipo de problema, normalmente eu criaria um struct, mas esses dois valores eram structs!
-        if(p.tirocimax[cont]==i.x+1&&p.tirocimay[cont]==i.y&&i.vivo==1){ 
-            i.vivo=0;
+    for(cont=0;cont<p.qtiroscima;cont++) //aqui encontrei um problema pois era necessario retornar dois valores: p e i
+        if(p.tirocimax[cont]==i.x+1&&(p.tirocimay[cont]==i.y||p.tirocimay[cont]==i.y-1)&&i.vivo==1){ 
+            i.vivo=0;p.tirocimax[cont]=1000;
         }
     for(cont=0;cont<p.qtirosesquerda;cont++)
-        if(p.tiroesquerdax[cont]==i.x+1&&p.tiroesquerday[cont]==i.y&&i.vivo==1){
-            i.vivo=0;
+        if((p.tiroesquerdax[cont]==i.x+1||p.tiroesquerdax[cont]==i.x)&&p.tiroesquerday[cont]==i.y&&i.vivo==1){
+            i.vivo=0;p.tirocimay[cont]=1000;
         }
     for(cont=0;cont<p.qtirosbaixo;cont++)
-        if(p.tirobaixox[cont]==i.x+1&&p.tirobaixoy[cont]==i.y&&i.vivo==1){
-            i.vivo=0;
+        if(p.tirobaixox[cont]==i.x+1&&(p.tirobaixoy[cont]==i.y||p.tirobaixoy[cont]==i.y-1)&&i.vivo==1){
+            i.vivo=0;p.tirocimax[cont]=1000;
         }
     for(cont=0;cont<p.qtirosdireita;cont++)
-        if(p.tirodireitax[cont]==i.x+1&&p.tirodireitay[cont]==i.y&&i.vivo==1){
-            i.vivo=0;
+        if((p.tirodireitax[cont]==i.x+1||p.tirodireitax[cont]==i.x)&&p.tirodireitay[cont]==i.y&&i.vivo==1){
+            i.vivo=0;p.tirocimay[cont]=1000;
         }
     return i;
 }
@@ -198,9 +198,10 @@ int main()
     jogador p[qplayers];
     inimigo i[qinimigos];
     p[0]=inicializajogador(p[0]);
-    if(qplayers==2)inicializajogador(p[1]);
-        for(cont=0;cont<qinimigos;cont++)
-            i[cont]=inicializainimigo(i[cont],cont,altura,largura);
+    if(qplayers==2)
+        inicializajogador(p[1]);
+    for(cont=0;cont<qinimigos;cont++)
+        i[cont]=inicializainimigo(i[cont],cont,altura,largura);
     while(c!=127){//loop de tempo, conforme o comando passa, o jogo resume.
         c=getch();
         if(c=='r')
