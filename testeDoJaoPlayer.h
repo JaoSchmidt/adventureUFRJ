@@ -1,15 +1,17 @@
 #include <ncurses.h>
+#include <stdio.h>
 
 typedef struct infoJogador{
     WINDOW *curWin;
     int locX,locY,maxY,maxX;
 }jogador;
 
-int initialize_player(WINDOW *win,int y,int x,jogador p1){
+jogador initialize_player(WINDOW *win,int y,int x,jogador p1){
     p1.locY = y;
     p1.locX = x;
     p1.curWin = win;
     getmaxyx(p1.curWin,p1.maxY,p1.maxX);
+    return p1;
 }
 
 void movUp(jogador p1){
