@@ -1,16 +1,18 @@
 //COMPILAR: gcc c.c -o c -Wall -lncurses
-//VERSIONBETA7.2
+//VERSIONBETA7.5
 //ESSE PROGRAMA NÃO USA VARIÁVEIS GLOBAIS AFIM DE GARANTIR PORTABILIDADE
 #include <stdio.h>
 #include <ncurses.h>
 #include <unistd.h>
 #include <time.h>
 #define qinimigos 50
+#define distanciainimigos 2
 
 typedef struct estrutura_jogador{ //estrutura para jogador
     int x,y;//cordenadas do cara
     unsigned short int direcao;//direção da seta presa no jogador;
     unsigned short int tirodisponivel; //essa flag impede que o jogador segure o tiro
+    unsigned short int vivo; //vivo ou n
     int qtirosdireita,qtirosesquerda,qtiroscima,qtirosbaixo;//q indica quantidade de tiros em cada direção
     int tirodireitax[50],tirodireitay[50];//cada tiro possui um x e y, el
     int tiroesquerdax[50],tiroesquerday[50];
@@ -33,12 +35,13 @@ jogador inicializajogador(jogador p)
     p.qtiroscima=0;
     p.direcao='>';
     p.tirodisponivel=0;
+    p.vivo=1;
     return p;
 }
 
 inimigo inicializainimigo(inimigo i,int cont,int altura,int largura){
     i.tempo=cont;i.vivo=1; //cada um nasce com o tempo diferente
-    i.x=2*cont;i.y=altura;
+    i.x=distanciainimigos*cont+40;i.y=distanciainimigos*cont;
     return i;
 }
 
@@ -155,30 +158,41 @@ void desenhainimigo(inimigo i){
         mvprintw(i.y,i.x,"\\o/");
 }
 
-inimigo colisaotiro(jogador p,inimigo i){ 
+inimigo colisaotiro(jogador p,inimigo i,int *tirocimax,int *tiroesquerday,int *tirobaixox,int *tirodireitay,int *score){ 
     int cont;
     for(cont=0;cont<p.qtiroscima;cont++) //aqui encontrei um problema pois era necessario retornar dois valores: p e i
-        if(p.tirocimax[cont]==i.x+1&&(p.tirocimay[cont]==i.y||p.tirocimay[cont]==i.y-1)&&i.vivo==1){ 
-            i.vivo=0;p.tirocimax[cont]=1000;
-        }
+        if(p.tirocimax[cont]==i.x+1&&i.vivo==1)
+            if(p.tirocimay[cont]==i.y||p.tirocimay[cont]==i.y-1){
+                i.vivo=0;*(tirocimax+cont)=1000;(*score)++;
+            }
     for(cont=0;cont<p.qtirosesquerda;cont++)
-        if((p.tiroesquerdax[cont]==i.x+1||p.tiroesquerdax[cont]==i.x)&&p.tiroesquerday[cont]==i.y&&i.vivo==1){
-            i.vivo=0;p.tirocimay[cont]=1000;
-        }
+        if(p.tiroesquerday[cont]==i.y&&i.vivo==1)
+            if(p.tiroesquerdax[cont]==i.x+1||p.tiroesquerdax[cont]==i.x){
+                i.vivo=0;*(tiroesquerday+cont)=1000;(*score)++;
+            }
     for(cont=0;cont<p.qtirosbaixo;cont++)
-        if(p.tirobaixox[cont]==i.x+1&&(p.tirobaixoy[cont]==i.y||p.tirobaixoy[cont]==i.y-1)&&i.vivo==1){
-            i.vivo=0;p.tirocimax[cont]=1000;
+        if(p.tirobaixox[cont]==i.x+1&&i.vivo==1)
+            if(p.tirobaixoy[cont]==i.y||p.tirobaixoy[cont]==i.y-1){
+                i.vivo=0;*(tirobaixox+cont)=1000;(*score)++;
         }
     for(cont=0;cont<p.qtirosdireita;cont++)
-        if((p.tirodireitax[cont]==i.x+1||p.tirodireitax[cont]==i.x)&&p.tirodireitay[cont]==i.y&&i.vivo==1){
-            i.vivo=0;p.tirocimay[cont]=1000;
+        if(p.tirodireitay[cont]==i.y&&i.vivo==1)
+            if(p.tirodireitax[cont]==i.x+1||p.tirodireitax[cont]==i.x){
+                i.vivo=0;*(tirodireitay+cont)=1000;(*score)++;
         }
     return i;
 }
 
+jogador morte(jogador p,inimigo i){
+    if(p.x==i.x&&p.y==i.y&&i.vivo==1)
+        p.vivo=0;
+    return p;
+}
+
+
 int main()
 {
-    int c=0,altura,largura,qplayers,cont,cont2;
+    int c=0,altura,largura,qplayers,cont,cont2,score=0;
     printf("Insira a qnt de jogadores: ");
     scanf("%d",&qplayers);
     initscr();
@@ -213,7 +227,10 @@ int main()
         p[0]=limite(p[0],altura,largura);
         if(qplayers==2)
             p[1]=limite(p[1],altura,largura);
-        clear();
+        clear(); //LIMPA A TELA*****
+        if(p[0].vivo==0)mvprintw(0,0,"vose morreu :(");
+        if(p[1].vivo==0&&qplayers==2)mvprintw(0,largura-15,"vose morreu :(");
+        mvprintw(0,largura-10,"pontos: %d",score);
         attron(COLOR_PAIR(1));
         desenhaplayer(p[0],1);
         attron(COLOR_PAIR(2));
@@ -234,7 +251,10 @@ int main()
             p[1]=desenhatiro(p[1]);
         for(cont2=0;cont2<qplayers;cont2++) //roda o(s) doi(s) jogadores pela função de colisão 
             for(cont=0;cont<qinimigos;cont++)
-                i[cont]=colisaotiro(p[cont2],i[cont]);
+            i[cont]=colisaotiro(p[cont2],i[cont],p[cont2].tirocimax,p[cont2].tiroesquerday,p[cont2].tirobaixox,p[cont2].tirodireitay,&score);
+        for(cont2=0;cont2<qplayers;cont2++) //roda o(s) doi(s) jogadores pela função de morte 
+            for(cont=0;cont<qinimigos;cont++)
+                p[cont2]=morte(p[cont2],i[cont]);
         usleep(50000);
     }
     endwin();
