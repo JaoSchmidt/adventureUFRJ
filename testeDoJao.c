@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <stdio.h>
 
 #include "testeDoJaoPlayer.h"
 
@@ -22,7 +23,7 @@ int main(){
     wrefresh(playerWin);
     do{
         movPlayer(player);
-    }while(Display(player) != KEY_DC);
+    }while(Display(player)!='p');
     
     
     getch();
