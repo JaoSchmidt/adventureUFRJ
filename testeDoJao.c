@@ -1,7 +1,7 @@
 #include <ncurses.h>
 #include <stdio.h>
 
-#include "testeDoJaoPlayer.h"
+#include "jao.h"
 
 int main(){
     //Ncurses start
@@ -9,8 +9,10 @@ int main(){
     cbreak();
     noecho();
 
+    //habilitar as setas do telcado
+    keypad(stdscr,TRUE);
     //get screen size for player
-    int maxY, maxX;
+    int maxY, maxX,c;
     getmaxyx(stdscr,maxY,maxX);
 
     //create new window in function of standart window
@@ -19,15 +21,18 @@ int main(){
     box(playerWin,0,0);
     refresh();
     jogador player;
-    initialize_player(playerWin,20,20,player);
+    jogador player =
+    player = initialize_player(playerWin,2,2,player);
     wrefresh(playerWin);
+    keypad(playerWin,TRUE);//habilitar as setas do telcado
     //do{
     //    movPlayer(player);
     //}while(Display(player)!='p');
-    while(getch() == ERR){
+    do{
+        c = Display(player);
         movPlayer(player);
         wrefresh(playerWin);
-    }
+    }while(c!='p');
     
     
     endwin();
