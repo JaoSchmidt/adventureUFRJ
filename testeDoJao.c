@@ -19,13 +19,16 @@ int main(){
     box(playerWin,0,0);
     refresh();
     jogador player;
-    initialize_player(playerWin,1,1,player);
+    initialize_player(playerWin,20,20,player);
     wrefresh(playerWin);
-    do{
+    //do{
+    //    movPlayer(player);
+    //}while(Display(player)!='p');
+    while(getch() == ERR){
         movPlayer(player);
-    }while(Display(player)!='p');
+        wrefresh(playerWin);
+    }
     
     
-    getch();
     endwin();
 }
