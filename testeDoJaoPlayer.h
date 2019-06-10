@@ -13,25 +13,25 @@ jogador initialize_player(WINDOW *win,int y,int x,jogador p1){
     getmaxyx(p1.curWin,p1.maxY,p1.maxX);
     return p1;
 }
-
-void movUp(jogador p1){
-    if(p1.locY>0){
-        p1.locY--;
+/*
+void movUp(jogador *pp1){
+    if(pp1->locY>0){
+        pp1->locY--;
     }
 }
-void movLeft(jogador p1){
-    if(p1.locX>0){
-        p1.locX-=2;
+void movLeft(jogador *pp1){
+    if(pp1->locX>0){
+        pp1->locX-=2;
     }
 }
-void movRight(jogador p1){
-    if(p1.locX<p1.maxX){
-        p1.locX+=2;
+void movRight(jogador *pp1){
+    if(pp1->locX<pp1->maxX){
+        pp1->locX+=2;
     }
 }
-void movDown(jogador p1){
-    if(p1.locY<p1.maxY){
-        p1.locY++;
+void movDown(jogador *pp1){
+    if(pp1->locY<pp1->maxY){
+        pp1->locY++;
     }
 }
 int Display(jogador p1){
@@ -39,24 +39,24 @@ int Display(jogador p1){
     switch (choice)
     {
     case KEY_UP:
-        movUp(p1);
+        movUp(&p1);
         break;
     case KEY_DOWN:
-        movDown(p1);
+        movDown(&p1);
         break;
     case KEY_LEFT:
-        movLeft(p1);
+        movLeft(&p1);
         break;
     case KEY_RIGHT:
-        movRight(p1);
+        movRight(&p1);
         break;
     default:
         break;
     }
     return choice;
 }
-
-void movPlayer(jogador p1){
-    mvwprintw(p1.curWin,p1.locY,p1.locX,"\\1/");
-    wrefresh(p1.curWin);
+*/
+jogador movPlayer(jogador p1){
+    mvwprintw(p1.curWin,p1.locY,p1.locX,"aa");
+    return p1;
 }
