@@ -8,6 +8,8 @@
 #define qinimigos 50
 #define distanciainimigos 2
 
+//STRUCTS GLOBAIS
+
 typedef struct estrutura_jogador{ //estrutura para jogador
     int x,y;//cordenadas do cara
     unsigned short int direcao;//direção da seta presa no jogador;
@@ -162,24 +164,25 @@ inimigo colisaotiro(jogador p,inimigo i,int *tirocimax,int *tiroesquerday,int *t
     int cont;
     for(cont=0;cont<p.qtiroscima;cont++) //aqui encontrei um problema pois era necessario retornar dois valores: p e i
         if(p.tirocimax[cont]==i.x+1&&i.vivo==1)
-            if(p.tirocimay[cont]==i.y||p.tirocimay[cont]==i.y-1){
+            if(p.tirocimay[cont]==i.y||p.tirocimay[cont]==i.y-1||p.tirocimay[cont]==i.y+1){
                 i.vivo=0;*(tirocimax+cont)=1000;(*score)++;
-            }
-    for(cont=0;cont<p.qtirosesquerda;cont++)
-        if(p.tiroesquerday[cont]==i.y&&i.vivo==1)
-            if(p.tiroesquerdax[cont]==i.x+1||p.tiroesquerdax[cont]==i.x){
-                i.vivo=0;*(tiroesquerday+cont)=1000;(*score)++;
             }
     for(cont=0;cont<p.qtirosbaixo;cont++)
         if(p.tirobaixox[cont]==i.x+1&&i.vivo==1)
-            if(p.tirobaixoy[cont]==i.y||p.tirobaixoy[cont]==i.y-1){
+            if(p.tirobaixoy[cont]==i.y||p.tirobaixoy[cont]==i.y-1||p.tirobaixoy[cont]==i.y+1){
                 i.vivo=0;*(tirobaixox+cont)=1000;(*score)++;
-        }
+            }
+    for(cont=0;cont<p.qtirosesquerda;cont++)
+        if(p.tiroesquerday[cont]==i.y&&i.vivo==1)
+            if(p.tiroesquerdax[cont]==i.x+1||p.tiroesquerdax[cont]==i.x||p.tiroesquerdax[cont]==i.x-1){
+                i.vivo=0;*(tiroesquerday+cont)=1000;(*score)++;
+            }
+    
     for(cont=0;cont<p.qtirosdireita;cont++)
         if(p.tirodireitay[cont]==i.y&&i.vivo==1)
-            if(p.tirodireitax[cont]==i.x+1||p.tirodireitax[cont]==i.x){
+            if(p.tirodireitax[cont]==i.x+1||p.tirodireitax[cont]==i.x||p.tirodireitax[cont]==i.x-1){
                 i.vivo=0;*(tirodireitay+cont)=1000;(*score)++;
-        }
+            }
     return i;
 }
 
