@@ -8,6 +8,6 @@ adventure but ufrj
 //enemies.h has the enemy's fucntions.
 
 
-//testeJao.h is my file
+//testeJao.c is my file
 
-//testeJaoplayer.c is my second file
+//testeJaoplayer.h is my second file
