@@ -6,11 +6,12 @@ typedef struct infoJogador{
     int locX,locY,maxY,maxX;
 }jogador;
 int k = 10;
-jogador initialize_player(WINDOW *win,int y,int x,jogador p1){
-    p1.locY = y;
-    p1.locX = x;
-    p1.curWin = win;//current window
-    getmaxyx(p1.curWin,p1.maxY,p1.maxX);
+jogador *initialize_player(WINDOW *win,int y,int x){
+    jogador *p1 = (jogador*) malloc(sizeof(jogador));
+    p1->locY = y;
+    p1->locX = x;
+    p1->curWin = win;//current window
+    getmaxyx(p1->curWin,p1->maxY,p1->maxX);
     return p1;
 }
 void movUp(jogador *pp1){
@@ -38,27 +39,27 @@ void movDown(jogador *pp1){
     }
     
 }
-int Display(jogador p1){
-    int choice = wgetch(p1.curWin);
+int Display(jogador *p1){
+    int choice = wgetch(p1->curWin);
     switch (choice)
     {
     case KEY_UP:
-        movUp(&p1);
+        movUp(p1);
         mvwprintw(stdscr,1,2,"up");
         wrefresh(stdscr);
         break;
     case KEY_DOWN:
-        movDown(&p1);
+        movDown(p1);
         mvwprintw(stdscr,1,2,"down");
         wrefresh(stdscr);
         break;
     case KEY_LEFT:
-        movLeft(&p1);
+        movLeft(p1);
         mvwprintw(stdscr,1,2,"left");
         wrefresh(stdscr);
         break;
     case KEY_RIGHT:
-        movRight(&p1);
+        movRight(p1);
         mvwprintw(stdscr,1,2,"right");
         wrefresh(stdscr);
         break;
@@ -68,6 +69,6 @@ int Display(jogador p1){
     return choice;
 }
 
-void movPlayer(jogador p1){
-    mvwprintw(p1.curWin,p1.locY,p1.locX,"aa");
+void movPlayer(jogador *p1){
+    mvwprintw(p1->curWin,p1->locY,p1->locX,"aa");
 }
