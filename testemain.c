@@ -20,9 +20,8 @@ int main(){
     WINDOW *playerWin = newwin(maxY*3/5,maxX*3/5,maxY*1/5,maxX*1/5);
     box(playerWin,0,0);
     refresh();
-    jogador player;
-    jogador player =
-    player = initialize_player(playerWin,2,2,player);
+    jogador *player = initialize_player(playerWin,2,2);
+    
     wrefresh(playerWin);
     keypad(playerWin,TRUE);//habilitar as setas do telcado
     //do{
