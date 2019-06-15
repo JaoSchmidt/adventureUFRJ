@@ -1,0 +1,29 @@
+#include <sys/time.h>
+#include <unistd.h>
+#include <stdio.h>
+
+struct timeval tv;
+
+void time_between_press(time_t *tv0){
+   gettimeofday(&tv,NULL);
+   time_t a;
+   a = tv.tv_sec - *tv0;
+   printf("%ld\n",a);
+   gettimeofday(&tv,NULL);
+   *tv0 = tv.tv_sec;
+}
+
+int main(){
+   gettimeofday(&tv,0); //tv = time today
+   time_t curtime;
+   curtime = tv.tv_sec;
+
+   time_between_press(&curtime);
+   sleep(3);
+   time_between_press(&curtime);
+   sleep(2);
+   time_between_press(&curtime);
+   sleep(1);
+   time_between_press(&curtime);
+   return 0;
+}
