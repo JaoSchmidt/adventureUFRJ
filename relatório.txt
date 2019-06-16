@@ -1,0 +1,17 @@
+/*//===========================================================================//
+João 14/6/10:
+removi altura e largura, cada janela terá altura e largura especificas
+jogadores agora são inicializados como ponteiros player1 e player2
+movimentos e limites de player1 e player2 são a mesma função, assim
+o pc n precisa calculcar as condições de limite sempre
+jogador e inimigos agora são inicializados como ponteiros
+muitos "if"s foram alterados para swtich
+colocada janela de batalha "playerWin"
+*///===========================================================================//
+/*//===========================================================================//
+João 15/6/10:
+criei a função time_elapsed(float*,float), retorna verdadeiro se o tempo (segundo
+parametro) for ultrapassado e zera o valor da primeira variavel. Se for falso
+retorna 0.
+wclean() removida, entidades que se movimentam apagarão seus rastros
+*///===========================================================================//
