@@ -1,6 +1,23 @@
 #ifndef PLAYER_HEADER
 #define PLAYER_HEADER
-#define MAXSHOOT 10
+#define MAXSHOOT 20
+
+typedef struct _TIROS{// estrutura para tiro
+    WINDOW *curWin;
+    int vivo,locx,locy,tiroPlayer;
+    int direcaotiro;
+} tiro;
+
+tiro * inicializatiro(WINDOW *win){
+    tiro *t =malloc(sizeof(tiro)) ;
+    t->curWin = win;
+    t->locx = 0;
+    t->locy = 0;
+    t->vivo = 0;
+    t->tiroPlayer = 1;
+    t->direcaotiro = '>';
+    return t;
+}
 
 typedef struct _JOGADOR{ //estrutura para jogador
     WINDOW *curWin;
@@ -34,40 +51,29 @@ jogador *inicializajogador(WINDOW *win,int y,int x)//inicia-se com as coordenada
 }
 
 
-void direcaodotiro(jogador *p){
+void adciona_tiro_ao_jogador(jogador *p,tiro *t){
+    t->vivo=1;
     switch (p->direcao)
     {
     case '^':
-        if(p->qtiroscima<MAXSHOOT){//os tiros n ultrapassam MAXSHOOT
-            p->tirocimax[p->qtiroscima]=p->locX+1;//esses dois fazem o tiro surgir nas coord do player
-            p->tirocimay[p->qtiroscima]=p->locY;//y-1,x-2,x+1,etc dizem sobre a posição que o tiro surge em função do tamanho do personagem, lembrando que ele é "\O/"
-            p->qtiroscima++;// aumenta quantidade de tiros em 1
-            break;
-        }
+        t->direcaotiro = '^';
+        t->locx=p->locX+1;//esses dois fazem o tiro surgir nas coord do player
+        t->locy=p->locY;//y-1,x-2,x+1,etc dizem sobre a posição que o tiro surge em função do tamanho do personagem, lembrando que ele é "\O/"
         break;
     case '<':
-        if(p->qtirosesquerda<MAXSHOOT){
-            p->tiroesquerdax[p->qtirosesquerda]=p->locX-3;
-            p->tiroesquerday[p->qtirosesquerda]=p->locY;
-            p->qtirosesquerda++;
-            break;
-        }
+        t->direcaotiro = '<';
+        t->locx=p->locX-3;
+        t->locy=p->locY;
         break;
     case 'v':
-        if(p->qtirosbaixo<MAXSHOOT){
-            p->tirobaixox[p->qtirosbaixo]=p->locX+1;
-            p->tirobaixoy[p->qtirosbaixo]=p->locY+2;
-            p->qtirosbaixo++;
-            break;
-        }
+        t->direcaotiro = 'v';
+        t->locx=p->locX+1;
+        t->locy=p->locY+2;
         break;
     case '>':
-        if(p->qtirosdireita<MAXSHOOT){
-            p->tirodireitax[p->qtirosdireita]=p->locX+5;
-            p->tirodireitay[p->qtirosdireita]=p->locY;
-            p->qtirosdireita++;
-            break;
-        }
+        t->direcaotiro = '>';
+        t->locx=p->locX+5;
+        t->locy=p->locY;
         break;
     default:
         break;
@@ -142,7 +148,7 @@ void desenhaplayer(jogador *p,int num){ //desenha o jogador no terminal
     return;
 }
 
-int controle(jogador *p,float *tatirar,float *tandar){ //aqui é onde ocorre o controle do player1 e player2;
+int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde ocorre o controle do player1 e player2;
     int choice = wgetch(p->curWin);
     switch (choice)
     {
@@ -171,38 +177,44 @@ int controle(jogador *p,float *tatirar,float *tandar){ //aqui é onde ocorre o c
     case 32 ://barra de espaço
     case '0':
         if(time_elapsed(tatirar,0.2)){
-            direcaodotiro(p);
+            for(int i=0;i<50;i++){
+                if(t[i]->vivo==0){
+                    adciona_tiro_ao_jogador(p,t[i]);
+                    break;
+                }
+            }
         }
-        break;
     default:
         break;
     }
     return choice;
 }
 
-void desenhatiro(jogador *p){// desenha tiros no terminal
+void desenhatiro(tiro * t[]){// desenha tiros no terminal
     int cont;
-    for(cont=0;cont<p->qtiroscima;cont++){
-        mvwprintw(p->curWin,p->tirocimay[cont],p->tirocimax[cont]," ");
-        p->tirocimay[cont]--;
-        mvwprintw(p->curWin,p->tirocimay[cont],p->tirocimax[cont],"^");
-    }
-    for(cont=0;cont<p->qtirosesquerda;cont++){
-        mvwprintw(p->curWin,p->tiroesquerday[cont],p->tiroesquerdax[cont]," ");
-        p->tiroesquerdax[cont]-=2;
-        mvwprintw(p->curWin,p->tiroesquerday[cont],p->tiroesquerdax[cont],"<");
-    }
-    for(cont=0;cont<p->qtirosbaixo;cont++){
-        mvwprintw(p->curWin,p->tirobaixoy[cont],p->tirobaixox[cont]," ");
-        p->tirobaixoy[cont]++;
-        mvwprintw(p->curWin,p->tirobaixoy[cont],p->tirobaixox[cont],"v");
-    }
-    for(cont=0;cont<p->qtirosdireita;cont++){
-        mvwprintw(p->curWin,p->tirodireitay[cont],p->tirodireitax[cont]," ");
-        p->tirodireitax[cont]+=2;
-        mvwprintw(p->curWin,p->tirodireitay[cont],p->tirodireitax[cont],">");
+    for(cont=0;cont<50;cont++){//50 eh o numero de tiros definido em main
+        if(t[cont]->vivo==1){
+            if(t[cont]->direcaotiro=='^'){
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+                t[cont]->locy--;
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'^');
+            }else if(t[cont]->direcaotiro=='<'){
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+                t[cont]->locx-=2;
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'<');
+            }else if(t[cont]->direcaotiro=='v'){
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+                t[cont]->locy++;
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'v');
+            }else if(t[cont]->direcaotiro=='>'){
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+                t[cont]->locx+=2;
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'>');
+            }
+        }
     }
 }
+
 
 //lembrar de checar por morte em cada movimento do inimigo
 /*void morte(jogador *p,inimigo i){
