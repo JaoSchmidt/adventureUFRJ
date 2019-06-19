@@ -15,3 +15,9 @@ parametro) for ultrapassado e zera o valor da primeira variavel. Se for falso
 retorna 0.
 wclean() removida, entidades que se movimentam apagarão seus rastros
 *///===========================================================================//
+/*//===========================================================================//
+João 19/6/10:
+typedef struct _tiro criada, agora os tiros são uma struct que contêm a localização
+e a "existência" do próprio tiro. Os tiros estão em um vetor de ponteiros, cada tiro
+é modificado como um ponteiro.
+*///===========================================================================//
