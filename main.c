@@ -18,11 +18,10 @@ int main(){
     //start input c
     int c=0;
     //ask number of players [1/2]
-    int cont,cont2,score=0;
     //int qplayers;
     //printf("Insira a qnt de jogadores: ");
     //scanf("%d",&qplayers);
-
+    int score;
     //INITIATE time counting
     clock_gettime(CLOCK_MONOTONIC,&spec); //isso define a função agora
     float enemy_instant, controle_instant,tiros_velocidade,controle_tiro;
@@ -62,17 +61,22 @@ int main(){
     init_pair(4,COLOR_RED,COLOR_BLACK);
     attron(A_BOLD);
     inimigo *i[qinimigos];
+    tiro *tiros_jogador[50];
+    int cont;
+    for(cont=0;cont<50;cont++){
+        tiros_jogador[cont] = inicializatiro(playerWin);
+    }
     for(cont=0;cont<qinimigos;cont++){
         i[cont]=inicializainimigo(cont,maxY*3/5,maxX*3/5);
     }
     desenhaplayer(player1,1);
     wtimeout(playerWin,1);
     do{//loop de tempo, conforme o comando passa, o jogo resume.
-        c = controle(player1,&controle_tiro,&controle_instant);
+        c = controle(player1,&controle_tiro,&controle_instant,tiros_jogador);
         
         desenhaplayer(player1,1);
         if(time_elapsed(&tiros_velocidade,0.05)){
-            desenhatiro(player1);//desenha os tiros
+            desenhatiro(tiros_jogador);//desenha os tiros
         }
         
         
