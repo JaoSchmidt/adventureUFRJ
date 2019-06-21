@@ -1,20 +1,40 @@
 //COMPILAR: gcc c.c -o c -Wall -lncurses
 //VERSIONBETA7.5
 //ESSE PROGRAMA NÃO USA VARIÁVEIS GLOBAIS AFIM DE GARANTIR PORTABILIDADE
-#define _POSIX_C_SOURCE 200809L//define o CLOCK_MONOLITIC
-#include <stdio.h>
-#include <ncurses.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
-#define qinimigos 50
-#define distanciainimigos 2
+//#define _POSIX_C_SOURCE 200809L//define o CLOCK_MONOLITIC
+//#include <stdio.h>
+//#include <ncurses.h>
+//#include <stdlib.h>
+//#include <unistd.h>
+//#include <time.h>
+//#define QINIMIGOS 2
+//#define DISTANCIA_INIMIGOS 2
+//#define MAX_SHOOT 5
+//
+//#include "time_elapsed.h"//declare this before anything else
+//#include "player.h"
+//#include "enemy.h"
 
-#include "time_elapsed.h"//declare this before anything else
-#include "player.h"
-#include "enemy.h"
+#ifndef JOGO_HEADER
+#define JOGO_HEADER
 
-int main(){   
+void write_your_initials(char *destino){
+    mvprintw(1,2,"Escreva o nome do jogador\n");
+    char a[50],*pa;
+    pa = a;
+    char c;
+    move(2,2);
+    while((c = getch())!='\n'){
+        refresh();
+        addch(c);
+        *pa = c;
+        *destino = *pa;
+        destino++;
+        pa++;
+    }
+}
+
+int jogo(){   
     //start input c
     int c=0;
     //ask number of players [1/2]
@@ -31,17 +51,12 @@ int main(){
     tiros_velocidade = enemy_instant;
     controle_tiro = enemy_instant;
 
-    //INITIATE ncurses
-    initscr();//initiate main window
-    cbreak();
-    noecho();
-
     //INITIATE new windows in function of standart window
     //function newwin(height, width, start_y,stat_x)
     int maxY, maxX;
     getmaxyx(stdscr,maxY,maxX);
-    WINDOW *playerWin = newwin(maxY*4/6,maxX*4/6,maxY*1/6,maxX*1/6);
-    WINDOW *borderPlayerWin = newwin(maxY*4/6+2,maxX*4/6+2,maxY*1/6-1,maxX*1/6-1);
+    WINDOW *playerWin = newwin(maxY*8/10,maxX*8/10,maxY*1/10,maxX*1/10);
+    WINDOW *borderPlayerWin = newwin(maxY*8/10+2,maxX*8/10+2,maxY*1/10-1,maxX*1/10-1);
     wborder(borderPlayerWin,'#','#','#','#','#','#','#','#');
     //atualiza as janelas
     wrefresh(borderPlayerWin);
@@ -54,38 +69,35 @@ int main(){
     
     //cores do jogo, em pares
     //init_pair(index, foreground, background);
+    use_default_colors();//allow default background color with -1
     start_color();
-    init_pair(1,COLOR_GREEN,COLOR_BLACK);
-    init_pair(2,COLOR_BLUE,COLOR_BLACK);
-    init_pair(3,COLOR_WHITE,COLOR_BLACK);
-    init_pair(4,COLOR_RED,COLOR_BLACK);
-    attron(A_BOLD);
-    inimigo *i[qinimigos];
-    tiro *tiros_jogador[50];
+    init_pair(1,COLOR_GREEN,-1);
+    init_pair(2,COLOR_BLUE,-1);
+    init_pair(3,COLOR_WHITE,-1);
+    init_pair(4,COLOR_RED,-1);
+    //attron(A_BOLD);
+    inimigo *i[QINIMIGOS];
+    tiro *tiros_jogador[MAX_SHOOT];
     int cont;
-    for(cont=0;cont<50;cont++){
-        tiros_jogador[cont] = inicializatiro(playerWin);
+    for(cont=0;cont<MAX_SHOOT;cont++){
+        tiros_jogador[cont] = inicializa_tiro(playerWin);
     }
-    for(cont=0;cont<qinimigos;cont++){
+    for(cont=0;cont<QINIMIGOS;cont++){
         i[cont]=inicializainimigo(cont,maxY*3/5,maxX*3/5);
     }
     desenhaplayer(player1,1);
     wtimeout(playerWin,1);
     do{//loop de tempo, conforme o comando passa, o jogo resume.
+        mvwprintw(playerWin,1,2,"{%d,%d,%d,%d,%d}",tiros_jogador[0]->vivo,tiros_jogador[1]->vivo,tiros_jogador[2]->vivo,tiros_jogador[3]->vivo,tiros_jogador[4]->vivo);
         c = controle(player1,&controle_tiro,&controle_instant,tiros_jogador);
         
         desenhaplayer(player1,1);
         if(time_elapsed(&tiros_velocidade,0.05)){
-            desenhatiro(tiros_jogador);//desenha os tiros
+            desenhatiro(tiros_jogador,player1);//desenha os tiros
         }
         
-        
-        
-        //wrefresh(playerWin);
-        //if(qplayers==2)
-        //    controle(player2);
         if(c=='r')
-            for(cont=0;cont<qinimigos;cont++)
+            for(cont=0;cont<QINIMIGOS;cont++)
                 i[cont]=inicializainimigo(cont,maxY,maxX);
         
         //if(p[0].vivo==0)mvprintw(0,0,"vose morreu :(");
@@ -93,32 +105,26 @@ int main(){
         //mvprintw(0,largura-10,"pontos: %d",score);
 
         
-        //attron(COLOR_PAIR(2));
-        //if(qplayers==2)
-        //    desenhaplayer(player2,2);
-        //Attron(COLOR_PAIR(4));
+        //wattron(playerWin,COLOR_PAIR(2));
+        wattron(playerWin,COLOR_PAIR(4));
         if(time_elapsed(&enemy_instant,0.5)){
-            for(cont=0;cont<qinimigos;cont++){//controle de inimigos
+            for(cont=0;cont<QINIMIGOS;cont++){//controle de inimigos
                 controleinimigo(i[cont],player1);
-                desenhainimigo(i[cont],player1);
             }
         }
-        //attron(COLOR_PAIR(3));
+        //wattron(playerWin,COLOR_PAIR(3));
         
-        //if(qplayers==2)
-        //    desenhatiro(player2);
-        //for(cont2=0;cont2<qplayers;cont2++) //roda o(s) doi(s) jogadores pela função de colisão 
-            for(cont=0;cont<qinimigos;cont++)
-                colisaotiro(player1,i[cont],&score);
-        //for(cont2=0;cont2<qplayers;cont2++) //roda o(s) doi(s) jogadores pela função de morte 
-        //    for(cont=0;cont<qinimigos;cont++)
+        for(cont=0;cont<QINIMIGOS;cont++)
+            colisaotiro(tiros_jogador,i[cont],&score,player1,maxY,maxX);
+        //    for(cont=0;cont<QINIMIGOS;cont++)
         //        morte(player1,i[cont]);
         //        morte(player2,i[cont]);
         
     }while(c!='p');
-    endwin();
-    return 0;
+    return score;
 }
+
+#endif
 
 /*//===========================================================================//
 coisas que nota-se que tem q fazer ainda:
@@ -126,8 +132,5 @@ coisas que nota-se que tem q fazer ainda:
 cada onda terá os inimigos em posições e tempos definidos.
 2.Fazer função que faz surgir os inimigos de forma controlada(espaço/tempo). Eu penso
 em usar argumentos variaveis.
-3.Fazer jogador menos bugado.
-4.uma opção interessante seria printar espaços em branco para cada movimento ao 
-invés de fazer clean em toda tela e reescrever tudo
-5.precisamos resetar os tiros quando eles somem
+3.precisamos resetar os tiros quando eles somem
 *///===========================================================================//
