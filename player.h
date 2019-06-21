@@ -186,7 +186,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
 
 void desenhatiro(tiro * t[],jogador *p){//draw shots on terminal
     int cont;
-    for(cont=0;cont<p->qtiros;cont++){//MAX_SHOOT is number of shots defined in main
+    for(cont=0;cont<p->MAX_SHOOT;cont++){//MAX_SHOOT is number of shots defined in main
         if(t[cont]->vivo==1){
             if(t[cont]->direcaotiro=='^'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
