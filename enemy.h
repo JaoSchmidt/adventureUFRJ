@@ -7,7 +7,7 @@ typedef struct _INIMIGO{ //estrutura para inimigo
     unsigned short int vivo; //essa flag indica se o bicho está vivo (bool)
 } inimigo;
 
-inimigo *inicializainimigo(int cont,int altura,int largura){
+inimigo *inicializa_inimigo(int cont,int altura,int largura){
     inimigo *i = (inimigo*) malloc(sizeof(inimigo));
     i->tempo=cont;
     i->vivo=1; //cada um nasce com o tempo diferente
@@ -19,21 +19,25 @@ inimigo *inicializainimigo(int cont,int altura,int largura){
 void controleinimigo(inimigo *i,jogador *p){
     if(i->vivo==1){
         mvwprintw(p->curWin,i->y,i->x,"   ");
-        if(i->x>p->locX){
+        float tg = ((float)(i->y-p->locY))/(i->x-p->locX);
+        float cotg = 1/tg;
+        mvwprintw(p->curWin,7,2,"%f",tg);
+        if(i->x-p->locX>=0 && tg>=-1 && tg<=1){
+            mvwprintw(p->curWin,5,2,"1f = %d %f",i->x-p->locX,tg);
+            i->y += tg*(-2);
             i->x-=2;
-        }
-        if(i->x<p->locX){
+        }else if(i->x-p->locX<=0 && tg>=-1 && tg<=1){
+            mvwprintw(p->curWin,5,2,"2f = %d %f",i->x-p->locX,tg);
+            i->y += tg*2;
             i->x+=2;
+        }else if(i->y-p->locY>0 && cotg<1 && cotg>-1){
+            i->x +=cotg*(-1);
+            i->y--;
+        }else if(i->y-p->locY<0 && cotg<1 && cotg>-1){
+            i->x +=cotg;
+            i->y++;
         }
-        if(i->x==p->locX){
-            if(i->y>p->locY){
-                i->y--;
-            }
-            if(i->y<p->locY){
-                i->y++;
-            }
-        }
-        mvwprintw(p->curWin,i->y,i->x,"\\o/");
+        mvwprintw(p->curWin,i->y,i->x,"OoO");
     }
 }
 
