@@ -7,5 +7,4 @@ adventure but ufrj
 //time_elapsed.h has a special function that can detect time variations
 //enemies.h has the enemy's fucntions.
 
-
 //I have created a personal branch for my tests
