@@ -1,5 +1,5 @@
 # adventureUFRJ
-Our initial intent was to build a simplified version of atari adventure. We decided to step back and build "Journey of the Prairie King", one of the minigames in "Stardew Valley"
+Our initial intent was to build a simplified version of atari adventure. However, we decided to step back and build "Journey of the Prairie King", one of the minigames in "Stardew Valley"
 
 //main.c is the program which has the main function. Has the menu.
 
