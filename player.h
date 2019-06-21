@@ -1,20 +1,18 @@
 #ifndef PLAYER_HEADER
 #define PLAYER_HEADER
-#define MAXSHOOT 20
 
 typedef struct _TIROS{// estrutura para tiro
     WINDOW *curWin;
-    int vivo,locx,locy,tiroPlayer;
+    int vivo,locx,locy;
     int direcaotiro;
 } tiro;
 
-tiro * inicializatiro(WINDOW *win){
-    tiro *t =malloc(sizeof(tiro)) ;
+tiro * inicializa_tiro(WINDOW *win){
+    tiro *t = (tiro*) malloc(sizeof(tiro));
     t->curWin = win;
     t->locx = 0;
     t->locy = 0;
     t->vivo = 0;
-    t->tiroPlayer = 1;
     t->direcaotiro = '>';
     return t;
 }
@@ -25,11 +23,7 @@ typedef struct _JOGADOR{ //estrutura para jogador
     unsigned short int direcao;//direção da seta presa no jogador;
     unsigned short int tirodisponivel; //essa flag impede que o jogador segure o tiro
     unsigned short int vivo; //vivo ou n
-    int qtirosdireita,qtirosesquerda,qtiroscima,qtirosbaixo;//q indica quantidade de tiros em cada direção
-    int tirodireitax[MAXSHOOT],tirodireitay[MAXSHOOT];//cada tiro possui um x e y, el
-    int tiroesquerdax[MAXSHOOT],tiroesquerday[MAXSHOOT];
-    int tirocimax[MAXSHOOT],tirocimay[MAXSHOOT];
-    int tirobaixox[MAXSHOOT],tirobaixoy[MAXSHOOT];
+    int qtiros;
 } jogador;
 
 
@@ -38,12 +32,9 @@ jogador *inicializajogador(WINDOW *win,int y,int x)//inicia-se com as coordenada
     jogador *p = (jogador*) malloc(sizeof(jogador));
     p->curWin = win;
     p->locX=x;p->locY=y;
-    p->qtirosdireita=0;
-    p->qtirosesquerda=0;
-    p->qtirosbaixo=0;
-    p->qtiroscima=0;
     p->direcao='>';
     p->vivo=1;
+    p->qtiros=0;
     // (*p).vivo = 1;
     //essa função escreve os máximos na janela win como maxY e maxX
     getmaxyx(p->curWin,p->maxY,p->maxX);
@@ -52,7 +43,8 @@ jogador *inicializajogador(WINDOW *win,int y,int x)//inicia-se com as coordenada
 
 
 void adciona_tiro_ao_jogador(jogador *p,tiro *t){
-    t->vivo=1;
+    p->qtiros++;
+    t->curWin=p->curWin;
     switch (p->direcao)
     {
     case '^':
@@ -78,6 +70,7 @@ void adciona_tiro_ao_jogador(jogador *p,tiro *t){
     default:
         break;
     }
+    t->vivo=1;
 }
 void clearPlayerTrack(jogador *p1){
     if(p1->direcao == '^'){
@@ -90,6 +83,9 @@ void clearPlayerTrack(jogador *p1){
         mvwprintw(p1->curWin,p1->locY,p1->locX,"     ");
     }else if(p1->direcao == '<'){
         mvwprintw(p1->curWin,p1->locY,p1->locX-2,"     ");
+        if(p1->locX == 0){
+        mvwprintw(p1->curWin,p1->locY,p1->locX,"   ");
+        }
     }
 }
 /*cada uma das funções controla p.direcao e p.locY e p.locX
@@ -177,7 +173,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde 
     case 32 ://barra de espaço
     case '0':
         if(time_elapsed(tatirar,0.2)){
-            for(int i=0;i<50;i++){
+            for(int i=0;i<MAX_SHOOT;i++){
                 if(t[i]->vivo==0){
                     adciona_tiro_ao_jogador(p,t[i]);
                     break;
@@ -190,9 +186,9 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde 
     return choice;
 }
 
-void desenhatiro(tiro * t[]){// desenha tiros no terminal
+void desenhatiro(tiro * t[],jogador *p){// desenha tiros no terminal
     int cont;
-    for(cont=0;cont<50;cont++){//50 eh o numero de tiros definido em main
+    for(cont=0;cont<p->qtiros;cont++){//MAX_SHOOT eh o numero de tiros definido em main
         if(t[cont]->vivo==1){
             if(t[cont]->direcaotiro=='^'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
