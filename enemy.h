@@ -44,7 +44,7 @@ void controleinimigo(inimigo *i,jogador *p){
 void colisaotiro(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,int maxX){ 
     if(i->vivo==1){
         int cont;
-        for(cont=0;cont<p->qtiros;cont++){
+        for(cont=0;cont<MAX_SHOOT;cont++){
             if(t[cont]->vivo==1){
                 if(t[cont]->locx==i->x+1 && t[cont]->locy==i->y){
                     t[cont]->vivo=0;
