@@ -1,7 +1,7 @@
 #ifndef PLAYER_HEADER
 #define PLAYER_HEADER
 
-typedef struct _TIROS{// estrutura para tiro
+typedef struct _TIROS{//shot struct
     WINDOW *curWin;
     int vivo,locx,locy;
     int direcaotiro;
@@ -19,15 +19,14 @@ tiro * inicializa_tiro(WINDOW *win){
 
 typedef struct _JOGADOR{ //estrutura para jogador
     WINDOW *curWin;
-    int locX,locY,maxX,maxY;//cordenadas do cara //cordendas máximas
-    unsigned short int direcao;//direção da seta presa no jogador;
-    unsigned short int tirodisponivel; //essa flag impede que o jogador segure o tiro
-    unsigned short int vivo; //vivo ou n
+    int locX,locY,maxX,maxY;//player coord //maximum coordinate
+    unsigned short int direcao;//player arrow direction;
+    unsigned short int vivo; //alive or not
     int qtiros;
 } jogador;
 
 
-jogador *inicializajogador(WINDOW *win,int y,int x)//inicia-se com as coordenadas do jogador em questão
+jogador *inicializajogador(WINDOW *win,int y,int x)//initialize with specificated coordinates
 {
     jogador *p = (jogador*) malloc(sizeof(jogador));
     p->curWin = win;
@@ -36,7 +35,7 @@ jogador *inicializajogador(WINDOW *win,int y,int x)//inicia-se com as coordenada
     p->vivo=1;
     p->qtiros=0;
     // (*p).vivo = 1;
-    //essa função escreve os máximos na janela win como maxY e maxX
+    //this function write the curWin limits on maxX and maxY
     getmaxyx(p->curWin,p->maxY,p->maxX);
     return p;
 }
@@ -49,8 +48,8 @@ void adciona_tiro_ao_jogador(jogador *p,tiro *t){
     {
     case '^':
         t->direcaotiro = '^';
-        t->locx=p->locX+1;//esses dois fazem o tiro surgir nas coord do player
-        t->locy=p->locY;//y-1,x-2,x+1,etc dizem sobre a posição que o tiro surge em função do tamanho do personagem, lembrando que ele é "\O/"
+        t->locx=p->locX+1;//those 2 make the shots appear on the player coord
+        t->locy=p->locY;//the small variations on locY and locX are to make the shots appear in the right position 
         break;
     case '<':
         t->direcaotiro = '<';
@@ -88,9 +87,8 @@ void clearPlayerTrack(jogador *p1){
         }
     }
 }
-/*cada uma das funções controla p.direcao e p.locY e p.locX
-a localização e coordenada máximas estão declaradas na janela cirada em main()
-e são usadas aqui*/
+/*each one of those functions controls p.direcao, p.locY and p.locX, the moviment limit
+that is defined on game(), is also used here*/
 void movUp(jogador *p1){
     if(p1->locY>0){
         clearPlayerTrack(p1);
@@ -122,8 +120,8 @@ void movDown(jogador *p1){
 }
 
 
-void desenhaplayer(jogador *p,int num){ //desenha o jogador no terminal
-    mvwprintw(p->curWin,p->locY,p->locX,"\\%d/",num); //print das setas q acompanham cada player
+void desenhaplayer(jogador *p,int num){ //draw the player on terminal
+    mvwprintw(p->curWin,p->locY,p->locX,"\\%d/",num); //print the keys that follow the player
     switch (p->direcao)
     {
     case '^':
@@ -144,7 +142,7 @@ void desenhaplayer(jogador *p,int num){ //desenha o jogador no terminal
     return;
 }
 
-int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde ocorre o controle do player1 e player2;
+int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the controler for player1
     int choice = wgetch(p->curWin);
     switch (choice)
     {
@@ -170,7 +168,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde 
         if(time_elapsed(tandar,0.08))
             movRight(p);
         break;
-    case 32 ://barra de espaço
+    case 32 ://space key
     case '0':
         if(time_elapsed(tatirar,0.2)){
             for(int i=0;i<MAX_SHOOT;i++){
@@ -186,9 +184,9 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde 
     return choice;
 }
 
-void desenhatiro(tiro * t[],jogador *p){// desenha tiros no terminal
+void desenhatiro(tiro * t[],jogador *p){//draw shots on terminal
     int cont;
-    for(cont=0;cont<p->qtiros;cont++){//MAX_SHOOT eh o numero de tiros definido em main
+    for(cont=0;cont<p->qtiros;cont++){//MAX_SHOOT is number of shots defined in main
         if(t[cont]->vivo==1){
             if(t[cont]->direcaotiro=='^'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
