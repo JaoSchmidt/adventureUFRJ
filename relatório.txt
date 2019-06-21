@@ -20,4 +20,17 @@ João 19/6/10:
 typedef struct _tiro criada, agora os tiros são uma struct que contêm a localização
 e a "existência" do próprio tiro. Os tiros estão em um vetor de ponteiros, cada tiro
 é modificado como um ponteiro.
+Diego e thalles 19/6/10
+Menu e créditos adicionados, utilizado a função sprintf para armazenar as opções de
+menu em list[]. Função main usada pra rodar o jogo foi nomada como jogo() e main()
+será o menu.
+*///===========================================================================//
+/*//===========================================================================//
+João 20/6/10:
+Bug do número de tiros, depois de um certo tempo, após ultrapassar o limite de tiros
+o programa trava com erro segmentation fault (core dumped). Colisao monstro e tiro
+refeita. Removido todas as funçoes sprintf, removido qtiroesquerda, qtirodireita,
+qtiroacima, qtiroabaixo, tiroaesquerdax, tiroadireitay, etc, do jogador.
+Adicionado pontuação no arquivo score.txt, adicionado créditos, adicionado limite
+de tela para tirs. Consterado bug de traços no canto esquerdo da tela.
 *///===========================================================================//
