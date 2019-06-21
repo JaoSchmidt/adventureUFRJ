@@ -188,7 +188,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //aqui é onde 
 
 void desenhatiro(tiro * t[],jogador *p){// desenha tiros no terminal
     int cont;
-    for(cont=0;cont<p->qtiros;cont++){//MAX_SHOOT eh o numero de tiros definido em main
+    for(cont=0;cont<MAX_SHOOT;cont++){//MAX_SHOOT eh o numero de tiros definido em main
         if(t[cont]->vivo==1){
             if(t[cont]->direcaotiro=='^'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
