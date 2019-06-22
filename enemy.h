@@ -15,6 +15,7 @@ inimigo *inicializa_inimigo(int vivo,int altura,int largura){
     return i;
 }
 
+////ENEMY MOVEMENT AND DRAW
 void controle_inimigo0(inimigo *i,jogador *p){
     if(i->vivo==1){
         mvwprintw(p->curWin,i->y,i->x,"   ");
@@ -82,8 +83,7 @@ void controle_inimigo_2(inimigo *i,jogador *p){
         mvwprintw(p->curWin,i->y,i->x,"<O>");
     }
 }
-
-
+////COLISION ENEMY WITH SHOTS
 void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,int maxX,int *enemy_number,WINDOW *stats){ 
     if(i->vivo==1){
         int cont;
@@ -109,6 +109,7 @@ void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,jogador *p,int max
         }
     }
 }
+
 void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,int maxX,int *enemy_number,WINDOW*stats){ 
     if(i->vivo==1){
         int cont;
@@ -136,7 +137,8 @@ void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,
         }
     }
 }
-void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,int *enemy_number,WINDOW *stats){
+////COLISION ENEMY WITH PLAYER
+void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,int *enemy_number,WINDOW *stats,int *pc){
     if(icolisao->vivo==1){
         if((icolisao->x+1==pcolisao->locX+1)&&icolisao->y == pcolisao->locY){
             icolisao->vivo=0;
@@ -155,13 +157,15 @@ void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,
             mvwprintw(stats,maxy/2+1,8+pcolisao->vida," ");
             if(pcolisao->vida == 9)
                 mvwprintw(stats,maxy/2+1,21," ");
+            if(pcolisao->vida == 0)
+                *pc=112;
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
         }
     }
 }
-void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int *enemy_number,WINDOW *stats){
+void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int *enemy_number,WINDOW *stats,int *pc){
     if(icolisao->vivo==1){
         if(icolisao->x==pcolisao->locX+1&&icolisao->y == pcolisao->locY){
             icolisao->vivo=0;
@@ -181,6 +185,8 @@ void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int
             mvwprintw(stats,maxy/2+1,8+pcolisao->vida," ");
             if(pcolisao->vida == 9)
                 mvwprintw(stats,maxy/2+1,21," ");
+            if(pcolisao->vida == 0)
+            *pc=112;
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
