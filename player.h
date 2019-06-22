@@ -21,7 +21,7 @@ typedef struct _JOGADOR{ //estrutura para jogador
     WINDOW *curWin;
     int locX,locY,maxX,maxY;//player coord //maximum coordinate
     unsigned short int direcao;//player arrow direction;
-    unsigned short int vivo; //alive or not
+    int vida; //alive or not
     int qtiros;
 } jogador;
 
@@ -32,7 +32,7 @@ jogador *inicializajogador(WINDOW *win,int y,int x)//initialize with specificate
     p->curWin = win;
     p->locX=x;p->locY=y;
     p->direcao='>';
-    p->vivo=1;
+    p->vida=10;
     p->qtiros=0;
     // (*p).vivo = 1;
     //this function write the curWin limits on maxX and maxY
@@ -99,14 +99,14 @@ void movUp(jogador *p1){
 void movLeft(jogador *p1){
     if(p1->locX>0){
         clearPlayerTrack(p1);
-        p1->locX-=2;
+        p1->locX--;
         p1->direcao = '<';
     }
 }
 void movRight(jogador *p1){
     if(p1->locX<p1->maxX-4){
         clearPlayerTrack(p1);
-        p1->locX+=2;
+        p1->locX++;
         p1->direcao = '>';
     }
 }
@@ -155,7 +155,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
         break;
     case '4':
     case 'a':
-        if(time_elapsed(tandar,0.08)) 
+        if(time_elapsed(tandar,0.06)) 
             movLeft(p);
         break;
     case '5':
@@ -165,13 +165,13 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
         break;
     case '6':
     case 'd':
-        if(time_elapsed(tandar,0.08))
+        if(time_elapsed(tandar,0.06))
             movRight(p);
         break;
     case 32 ://space key
     case '0':
         if(time_elapsed(tatirar,0.2)){
-            for(int i=0;i<MAX_SHOOT;i++){
+            for(int i=0;i<MAX_SHOTS;i++){
                 if(t[i]->vivo==0){
                     adciona_tiro_ao_jogador(p,t[i]);
                     break;
@@ -184,36 +184,47 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
     return choice;
 }
 
-void desenhatiro(tiro * t[],jogador *p){//draw shots on terminal
+void desenhatiroY(tiro * t[],jogador *p){//draw shots on terminal
     int cont;
-    for(cont=0;cont<p->MAX_SHOOT;cont++){//MAX_SHOOT is number of shots defined in main
+    for(cont=0;cont<MAX_SHOTS;cont++){//MAX_SHOTS is number of shots defined in main
         if(t[cont]->vivo==1){
             if(t[cont]->direcaotiro=='^'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
                 t[cont]->locy--;
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'^');
-            }else if(t[cont]->direcaotiro=='<'){
-                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
-                t[cont]->locx-=2;
-                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'<');
             }else if(t[cont]->direcaotiro=='v'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
                 t[cont]->locy++;
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'v');
+            }
+        }
+    }
+}
+void desenhatiroX(tiro * t[],jogador *p){//draw shots on terminal
+    int cont;
+    for(cont=0;cont<MAX_SHOTS;cont++){//MAX_SHOTS is number of shots defined in main
+        if(t[cont]->vivo==1){
+            if(t[cont]->direcaotiro=='<'){
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+                t[cont]->locx--;
+                mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'<');
             }else if(t[cont]->direcaotiro=='>'){
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
-                t[cont]->locx+=2;
+                t[cont]->locx++;
                 mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,'>');
             }
         }
     }
 }
+void colisao_tiro(tiro *t[],int maxY,int maxX){ 
+    int cont;
+    for(cont=0;cont<MAX_SHOTS;cont++){
+        if(t[cont]->locx<0||t[cont]->locx>maxX||t[cont]->locy<0||t[cont]->locy>maxY){
+            t[cont]->vivo=0;
+            mvwaddch(t[cont]->curWin,t[cont]->locy,t[cont]->locx,' ');
+        }
+    }
+}
 
-
-//lembrar de checar por morte em cada movimento do inimigo
-/*void morte(jogador *p,inimigo i){
-    if(p->locX==i.x&&p->locY==i.y&&i.vivo==1)
-        p->vivo=0;
-}*/
 
 #endif
