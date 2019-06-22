@@ -8,9 +8,12 @@
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
-#define QINIMIGOS 2
+#define ENEMYTYPE0MAX 15
+#define ENEMYTYPE1MAX 15
+#define ENEMYTYPE2MAX 15
+#define ENEMYTYPE3MAX 0
 #define DISTANCIA_INIMIGOS 2
-#define MAX_SHOOT 5//quando acabar os tiros, o pc dará segmentation fault(core dumped)
+#define MAX_SHOTS 20//shots
 
 #include "time_elapsed.h"//declare this before anything else
 #include "player.h"
@@ -19,25 +22,25 @@
 
 typedef struct _PLAYER_SCORE{
     int score;
-    char *name;
+    char name[50];
 } pontuacao;
 
-//void organize_score(pontuacao pts[]){//organize score from biggest to smallest
-//    char temp_char[50];
-//    int temp_int;
-//    for (int i = 0;i<10;i++){
-//        for (int j = i + 1; j < 10; j++){
-//            if (pts[i].score>=pts[j].score){
-//                temp_int = pts[i].score;
-//                pts[i].score = pts[j].score;
-//                pts[j].score = temp_int;
-//                strcpy(temp_char,pts[i].name);
-//                strcpy(pts[i].name,pts[j].name);
-//                strcpy(pts[j].name,temp_char);
-//            }
-//        }
-//    }
-//}
+void organize_score(pontuacao pts[]){//organize score from biggest to smallest
+    char temp_char[50];
+    int temp_int;
+    for (int i = 0;i<11;i++){
+        for (int j = i + 1; j < 11; j++){
+            if (pts[i].score<=pts[j].score){
+                temp_int = pts[i].score;
+                pts[i].score = pts[j].score;
+                pts[j].score = temp_int;
+                strcpy(temp_char,pts[i].name);
+                strcpy(pts[i].name,pts[j].name);
+                strcpy(pts[j].name,temp_char);
+            }
+        }
+    }
+}
 
 int main() {
     WINDOW *w;
@@ -48,9 +51,9 @@ int main() {
     initscr(); // initialize Ncurses
     noecho(); // disable echoing of characters on the screen
     cbreak();
-    int maxY;
-    maxY=getmaxy(stdscr);//maxY is the height of stdscr
-    w = newwin( 10, 150, 1, 1 ); // create a new window
+    int maxY,maxX;
+    getmaxyx(stdscr,maxY,maxX);//maxY is the height of stdscr
+    w = newwin( 10, maxX-1, 1, 1 ); // create a new window
     box( w, 0, 0 ); // sets default borders for the window
     
      
@@ -71,10 +74,10 @@ int main() {
     curs_set(0); // hide the default screen cursor.
 
     //score data: name and score of player
-    pontuacao score_player[10],recent_score;
-    //recent_score.name="aaa";
-    char temp_variable_for_test[50];
-    
+    pontuacao score_player[11],recent_score;//score_player[10] will be the recent player
+    strcpy(recent_score.name,"None");
+    recent_score.score = 0;
+
     // get the input
     do{ 
         ch=wgetch(w);//get ch
@@ -102,36 +105,23 @@ int main() {
                     clear();//will clear the window stdscr after refresh
                     refresh();//will refresh to apply clear()
                     curs_set(1);
-                    write_your_initials(temp_variable_for_test);
+                    write_your_initials(recent_score.name);
                     curs_set(0);
-                    recent_score.score = jogo();
-                    //FILE *parq1;
-                    //parq1 = fopen("score.txt","r");
-                    //while(!feof(parq1)){
-                    //    fscanf(parq1,"%d %[A-Z a-z]\n",&score_player[i].score,score_player[i].name);
-                    //}
-                    //fclose(parq1);
-                    //parq1 = fopen("score.txt","w+");
-                    //score_player[9].score = recent_score.score;
-                    //strcpy(score_player[9].name,recent_score.name);
-                    //char temp_char[50];
-                    //int temp_int;
-                    //for (int i = 0;i<10;i++){
-                    //    for (int j = i + 1; j < 10; j++){
-                    //        if (score_player[i].score>=score_player[j].score){
-                    //            temp_int = score_player[i].score;
-                    //            score_player[i].score = score_player[j].score;
-                    //            score_player[j].score = temp_int;
-                    //            strcpy(temp_char,score_player[i].name);
-                    //            strcpy(score_player[i].name,score_player[j].name);
-                    //            strcpy(score_player[j].name,temp_char);
-                    //        }
-                    //    }
-                    //}
-                    ////organize_score(&score_player);
-                    //for(int i;i<10;i++){
-                    //    fprintf(parq1,"%d %s\n",score_player[i].score,score_player[i].name);
-                    //}
+                    recent_score.score = game();
+                    FILE *parq1;
+                    parq1 = fopen("score.txt","r");
+                    for(int i=0;i<10;i++){
+                        fscanf(parq1,"%d %[A-Z a-z]\n",&score_player[i].score,score_player[i].name);
+                    }
+                    fclose(parq1);
+                    strcpy(score_player[10].name,recent_score.name);
+                    score_player[10].score = recent_score.score;
+                    parq1 = fopen("score.txt","w+");
+                    organize_score(score_player);
+                    for(int i=0;i<10;i++){
+                        fprintf(parq1,"%d %s\n",score_player[i].score,score_player[i].name);
+                    }
+                    fclose(parq1);
                     clear();
                     refresh();
                     break;
@@ -177,7 +167,6 @@ int main() {
         wattroff( w, A_STANDOUT );
     }while(ch!=27);
  
-    //delwin(w);
     endwin();
     return 0;
 }
