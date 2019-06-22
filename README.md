@@ -11,4 +11,4 @@ Our initial intent was to build a simplified version of atari adventure. However
 
 //enemies.h has the enemy's fucntions.
 
-//the alpha branch is for tests, do whatever you want there
+use -lncurses to compile
