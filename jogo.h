@@ -61,7 +61,7 @@ int game(){
     float enemy0_instant,enemy1_instant,enemy2_instant,enemy3_instant
     ,controle_instant,tiros_velocidadeY,controle_tiro,tiros_velocidadeX
     ,enemy_spawn;
-    //spec.tv_sec = tempo em segundos, spec.tv_nsec = tempo em nanoseg
+    //spec.tv_sec = time in seconds, spec.tv_nsec = time in nanoseg
     //those varivables control the time of each entity
     enemy0_instant = spec.tv_sec + ((float)spec.tv_nsec/1.0e9);
     enemy1_instant = enemy0_instant;
@@ -134,7 +134,7 @@ int game(){
     do{//time loop, as time passes, the game run
         c = controle(player1,&controle_tiro,&controle_instant,tiros_jogador);
         execute_wave(wave_number,&enemy_spawn,&small_wave,&enemy_amount,i0,i1,i2,i3,maxY*15/20,maxX*9/10);//INITATE FIRST WAVE
-        ////MOVIMENTO JOGADOR
+        ////PLAYER MOVMENT
         wattron(playerWin,COLOR_PAIR(2));
         desenhaplayer(player1,1);
         colisao_tiro(tiros_jogador,maxY,maxX);
@@ -145,7 +145,7 @@ int game(){
             desenhatiroX(tiros_jogador,player1);//draw the shots on x axis
         }
         wattroff(playerWin,COLOR_PAIR(2));
-        //MOVIMENTO INIMIGO
+        //ENEMY MOVMENT
         wattron(playerWin,COLOR_PAIR(4));
         if(time_elapsed(&enemy0_instant,0.6)){
             for(cont=0;cont<ENEMYTYPE0MAX;cont++){//enemies0 control
@@ -163,26 +163,30 @@ int game(){
             }
         }
         wattroff(playerWin,COLOR_PAIR(4));
-        //COLISAO ENTRE TIRO E PLAYER
+        //SHOTS AND PLAYER COLISION
         for(cont=0;cont<ENEMYTYPE0MAX;cont++){
             colisao_tiro_inimigo_0e1(tiros_jogador,i0[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
-            colisao_player_inimigos_0e1(player1,i0[cont],&score,&enemy_amount,statsWin);
+            colisao_player_inimigos_0e1(player1,i0[cont],&score,&enemy_amount,statsWin,&c);
         }
         for(cont=0;cont<ENEMYTYPE1MAX;cont++){
             colisao_tiro_inimigo_0e1(tiros_jogador,i1[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
-            colisao_player_inimigos_0e1(player1,i1[cont],&score,&enemy_amount,statsWin);
+            colisao_player_inimigos_0e1(player1,i1[cont],&score,&enemy_amount,statsWin,&c);
         }
         for(cont=0;cont<ENEMYTYPE2MAX;cont++){
             colisao_tiro_inimigo_2(tiros_jogador,i2[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
-            colisao_player_inimigos2(player1,i2[cont],&score,&enemy_amount,statsWin);
+            colisao_player_inimigos2(player1,i2[cont],&score,&enemy_amount,statsWin,&c);
         }
     }while(c!='p');
-
-    if(player1->vida==0){
+    
+    if(player1->vida<=0){
         //printem uma tela de game over maneira na stdscr aqui;
         //printem o score estilisado se quiserem tbm;
+        clear();
+        refresh();
+        mvprintw(2,2,"fim de jogo");
         getch();
     }
+    sleep(1);
     return score;
 }
 
