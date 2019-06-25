@@ -9,7 +9,7 @@ muitos "if"s foram alterados para swtich
 colocada janela de batalha "playerWin"
 *///===========================================================================//
 /*//===========================================================================//
-João 15/6/19:
+João 15/6/19:a
 criei a função time_elapsed(float*,float), retorna verdadeiro se o tempo (segundo
 parametro) for ultrapassado e zera o valor da primeira variavel. Se for falso
 retorna 0.
