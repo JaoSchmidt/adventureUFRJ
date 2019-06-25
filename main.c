@@ -61,8 +61,6 @@ int main() {
     for( i=0; i<5; i++ ) {
         if( i == 1 ) 
             wattron( w, A_STANDOUT ); // highlights the first item.
-        
-        //sprintf(item, "%-6s",  list[i]);
         mvwprintw( w, i+1, 2, "%s", list[i] );
         wattroff( w, A_STANDOUT );
     }
@@ -82,7 +80,6 @@ int main() {
     do{ 
         ch=wgetch(w);//get ch
         //// right pad with spaces to make the items appear with even width.
-        //sprintf(item, "%-6s",  list[i]); 
         mvwprintw(w,i+1,2,"%s",list[i]);
         box(w,0,0); 
         ////use ch to increase or decrease the value i based on the input.
@@ -162,7 +159,6 @@ int main() {
         }
         ////now highlight the next item in the list.
         wattron( w, A_STANDOUT );
-        //sprintf(item, "%-6s",  list[i]);
         mvwprintw( w, i+1, 2, "%s", list[i]);
         wattroff( w, A_STANDOUT );
     }while(ch!=27);
