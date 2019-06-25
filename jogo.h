@@ -67,12 +67,14 @@ void write_your_initials(char *destino){
     char c;
     move(2,2);
     while((c = getch())!='\n'){
-        refresh();
-        addch(c);
-        *pa = c;
-        *destino = *pa;
-        destino++;
-        pa++;
+        if(isalnum(c) || c == ' '){
+            refresh();
+            addch(c);
+            *pa = c;
+            *destino = *pa;
+            destino++;
+            pa++;
+        }
     }
 }
 
