@@ -1,10 +1,10 @@
 #ifndef JOGO_HEADER
 #define JOGO_HEADER
 
-void execute_wave(int waveN,float *time0,int *smallW,int *enemy_amount,
+void execute_wave(int *waveNum,float *time0,int *smallW,int *enemy_amount,
 inimigo *enemy0[],inimigo *enemy1[],inimigo *enemy2[],inimigo *enemy3[],
 int Y,int X){
-    if(waveN == 0){
+    if(*waveNum == 0){
         if(*smallW==0){
             enemy1[0] = inicializa_inimigo(1,10,10-0);
             enemy1[1] = inicializa_inimigo(1,11,10-1);
@@ -20,17 +20,45 @@ int Y,int X){
             *smallW = 1;
             
         }
-        if(time_elapsed(time0,4)&&(*smallW==1)){
+        if(time_elapsed(time0,2)&&(*smallW==1)){
             enemy0[0] = inicializa_inimigo(1,Y/2+0,X/2+0);
             enemy0[1] = inicializa_inimigo(1,Y/2+1,X/2+1);
             enemy0[2] = inicializa_inimigo(1,Y/2+2,X/2+2);
             enemy0[3] = inicializa_inimigo(1,Y/2+3,X/2+3);
             enemy0[4] = inicializa_inimigo(1,Y/2+4,X/2+4);
             *enemy_amount+=5;
-            *smallW = 2;
+            *smallW = 0;
+            *waveNum = 1;
+
+        }
+    }
+    if((*waveNum == 1) && *enemy_amount == 0){
+        if(*smallW==0){
+            enemy0[0] = inicializa_inimigo(1, Y/4, X/4);
+            enemy0[1] = inicializa_inimigo(1, Y/4+1, X/4+1);
+            enemy0[2] = inicializa_inimigo(1, Y/4+2, X/4+2);
+            enemy0[3] = inicializa_inimigo(1, Y/4+3, X/4+3);
+            enemy0[4] = inicializa_inimigo(1, Y/4+4, X/4+4);
+            enemy0[5] = inicializa_inimigo(1, Y/4+5, X/4);
+            enemy0[6] = inicializa_inimigo(1, Y/4+6, X/4);
+            enemy0[7] = inicializa_inimigo(1, Y/4+7, X/4);
+            enemy2[0] = inicializa_inimigo(1,Y+1,10);
+            enemy2[1] = inicializa_inimigo(1,Y+2,10);
+            enemy2[2] = inicializa_inimigo(1,Y+3,10);
+            enemy2[3] = inicializa_inimigo(1,Y+4,10);
+            enemy2[4] = inicializa_inimigo(1,Y+5,10);
+            *enemy_amount+=13;
+            *smallW=1;
+            *waveNum = 2;
+        }
+    }
+    if((*waveNum == 2) && *enemy_amount == 0){
+        if(*smallW=1){
+
         }
     }
 }
+
 
 void write_your_initials(char *destino){
     mvprintw(1,2,"Escreva o nome do jogador\n");
@@ -88,10 +116,8 @@ int game(){
     //INITIATE STATS AND PLAYER
     jogador *player1 = inicializajogador(playerWin,15,50);//newplayer player1
     desenhaplayer(player1,1);
-    int remaning_enemies = 25;//please put the number of enemies in wave 0;
     mvwprintw(statsWin,stat_maxy/2+1,2,"Vida [==========]  %d",player1->vida);
     mvwprintw(statsWin,stat_maxy/2-1,2,"Score: 0");
-    mvwprintw(statsWin,stat_maxy/2-1,stat_maxx/2 +2,"remaning_enemies %d",remaning_enemies);
 
     
     wrefresh(statsWin);
@@ -133,7 +159,7 @@ int game(){
     wtimeout(playerWin,1);
     do{//time loop, as time passes, the game run
         c = controle(player1,&controle_tiro,&controle_instant,tiros_jogador);
-        execute_wave(wave_number,&enemy_spawn,&small_wave,&enemy_amount,i0,i1,i2,i3,maxY*15/20,maxX*9/10);//INITATE FIRST WAVE
+        execute_wave(&wave_number,&enemy_spawn,&small_wave,&enemy_amount,i0,i1,i2,i3,maxY*15/20,maxX*9/10);//INITATE FIRST WAVE
         ////PLAYER MOVMENT
         wattron(playerWin,COLOR_PAIR(2));
         desenhaplayer(player1,1);
@@ -178,15 +204,66 @@ int game(){
         }
     }while(c!='p');
     
+    int y=0, x=0;
     if(player1->vida<=0){
-        //printem uma tela de game over maneira na stdscr aqui;
-        //printem o score estilisado se quiserem tbm;
         clear();
-        refresh();
-        mvprintw(2,2,"fim de jogo");
+        //printem uma tela de game over maneira na stdscr aqui;
+        mvprintw(y++, x,"       XXXXXXXNNNNXXXKXXNXXXXXXXXXNNNNNNNNNNNNNNNWWNNNWWWWWWWWNNWWWWNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       XXNNNNNNNNNNNXXXXXXXNNNXXNNNNNNNNNNNNNNNNNNWWNNWNNWN0dlccldOKXNNWNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNXNNNNNNNNNNNNNNNNNNWWWWNX0xoc'.... ..';lxKNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWWWWWWXkl;..        ......,cx0XNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWWWWWWWWWWWNXk;.              ........,:lOXXNNWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWWWWWWNXx'             ..............,ldxkKNWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWN0o'   ..',,''...';::::;;,'......,;;;cONWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNWWWWWWWWWWWWWWWWWWNNKc. ..;okOOOkkxxxkkkxxddddlc:,'..'...;dKNWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNWNNWWWWWWWWWWWWWWWWWNX0l..,oOKXXKKKKKKKKKK00000000OOkxl,....;oOXWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNWWNWWNNWWWWWWWWWWWWWWWWNOc'..c0XXXXXXXKKKKKKKKKKKKKKKKKXXXXO;. ..:dOXWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWKl.  .cKXXXXXXXKKKK00000KKKKKKKKXXXNNNx.  ..':xNMWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWXd.   .xXXXXXXXXKKKK0000KKKKKKKXXXXXNNWK;  ...'cONWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWNo.   'kXXXXXXXXKKKK0000KK0KKKKXXXXXNNNKl.  ...;dXMWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNWNNWWWWWWWWWWWWWWWWWWWWNK0o.   ,OXXXXKK00000OOOO000kkxoloodk0XNWXl.. ..';xNWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWNKx;.   ,0KOdl::;:clldxkkkkkoc;,',;:cd0NWXo'....',dXWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNWNKl.   ;0Olccc:;,;:coxOOOkxo:;;:looodkOKXx,....';OWWWWWWWWMWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNWWWWWWWWWWWWWWWWWXc.  .'cdddol:,..',clloollc,....';lxko,cd;....':OWWWWMMWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWWNk,  ..;xkl;,....',cloxkdccc,''..,coxkdkxl,..;oONWWWMWWMWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNNNWWWWWWWWWNO,  'okxololccloddlxKK0ocxdollloxkkkKWXo..'lkXNWMWWMMWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNWWWNNNNNNNNNWNWWWWWWWWWWWWXd..:OOO0OkkxkkOOkOKKKKKOxddxxddxk0XNWNk,'o00XWWWWWWWWWMMWWMMWWWW");
+        mvprintw(y++, x,"       NNNNNNNNWWWWWNNNNNWWWWWWWWWWWWWWWWWWKc.,0XKK00OkxxxkKKK00KXX0xlldkkOKXNWWWk;cOXNWWWWWWWWWWWMWMMMWWWW");
+        mvprintw(y++, x,"       NNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW0::ONNNXKOdldkkxdxxxxdx0klcdkO0KXNWWNkox0XWWWWWWWWWWWWWWMMMMWWM");
+        mvprintw(y++, x,"       NNNNNNWNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWNOlkNXX0xlcoxxo;,;;;'..,colccdk0KXNNXdo0XNWWWWWWWWWWWWWWMMMWWMM");
+        mvprintw(y++, x,"       NNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWKod000x:,;::;,...',....,;;,',:dOKKX0ldNNNWWWWWWWWWWWWWWMMMWWMM");
+        mvprintw(y++, x,"       NNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWOldkxc...:odoccllll::codo;'..:x00OdlkNNWWWWWWWWWWWWWWWMMMWWWW");
+        mvprintw(y++, x,"       NNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWKo:ldl,,::;:lxxxxxkxddxo;,;::okkkxlcOXWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNWWWWWWWWWWWWWWNX0kk0XNNWWWWWWWNd,,colldo:;oOkOK000kkkl:loldkxoddclKWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNWNNNNWWWWWWWNKd:,....,coOXWWWWWW0:'':oox00OkkxkkxxxxxkO00xodo::oc;xNWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNWWWNKd,.       ..'dNWWWWWNk,..;lxOKK00Okxdoddx0XK0kl;',;,,oKWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNN0c.           .;0NNNWWWNk,..;oO0K0Okxl:;;coxOkd:,,,,',dKWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       XXXXXXXXXXXXXXXXXKd'            .'d0KNNKKXN0:..'o0KKK0Oo::ldddoc;..'',cxXWNNNWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       XXXXXXXXXXXXXXXXK0x:.          ..'oO0XKddKNNKl. .lxk00ko::ccc:,''.':ox0XNWNNNWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNNNNNNNXXNNNNNNNXX0o,.         .:0XXNKolKNNNKo'...';:;'..'''....;d0KKKNNWNKXWWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       NNKkdlc:::cd0XNXXXX0xo:.        ,ONWWWNOxKWNNXKxc,.............,lxOOO0KNWMNdlKWWWWWWWWWWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       Kk:....;::c:lk0KKK0kodko,.   ..;kNWWNWNXKXNNNNX0kddoc;'.....';clodO0KXXWWWWx.,dKNWWWWWNWWWWWWWWWWWWW");
+        mvprintw(y++, x,"       d'  .cx0KKXXKKKKK000OxO0Odc''cxOXNNNNNNXXNNNNNWXKOkkxxxolccloodxOKNNNXNNWWMx...,oONNNNNNNWWWWWWWWWWW");
+        mvprintw(y++, x,"       ;   'looddxxdodkkxk0K0KKOo,...',lkKXXXXXXXKdl0WNNNNXK0OOkkkkOKXNNNXXNNNWWMWl......:oxO0XXNNNNNNNNNNN");
+        mvprintw(y++, x,"       ;   'loloc....,od:,,::c:.      ...:dO0Odc;;:o0WNNNNNNNX0kk0XNNNNNNNNNNWWWW0, ....    .';:loxk0000KXN");
+        mvprintw(y++, x,"       l.  .cdxxl'. .l00o. ...         .....'.   ,0NXNXXXXXNXKKKKXNNNNNNNNNNNNWNNx.               ..,;cokXN");
+        mvprintw(y++, x,"       kc....,cdxdoc';c:'.         ......        .dNXK00000KKXXXXXNNNWNNNNNNNNNXKo.                    ..,:");
+        mvprintw(y++, x,"       kxl;'...ck0x;.            .....            'kNKKKKKKKK000O0KXNNNXXXXNNXXKKc                         ");
+        mvprintw(y++, x,"       ;'..  ..:xd;.       .......                 lNNXXXKK0000000KKKXXXK0KXNXKKO,                         ");
+        mvprintw(y++, x,"               .,,.     ......                     oNXKKKKK0OO00KK0000KNK0KXXXKKO,                         ");
+        mvprintw(y++, x,"       llllllooodddddc.                           .dNXXKXXNXXKXXXXXXXXXKKKXNXKKXO;                         ");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNK:.                        .. .kNNXXXXNNNXNNNNNNNXXXXNNNKKXXk.                         ");
+        mvprintw(y++, x,"       NNNNNNNNNNNNNd.                       ...  ;0NNXXXXXNNNNNNNNNNNNNNNNXKXXNo.         . .             ");
+        mvprintw(y++, x,"       NNNNNNNNNNNNXc                 .     .... .lXNNNNXXXXNNNNNNNNNNNNNNXXXXNXc           ..             ");
+        mvprintw(y++, x,"       NNNNNNNNNNNKl.                 .     .... .xNNNNNXXXXXNNNNNNNNNNNNXXXXXN0;                          ");
+        mvprintw(y++, x,"       NNNNNNNNNNKc.                 ..  ....... 'OWNNNNXXXXXNNNNNNNNNNNXXXXXNWO'                          ");
+        mvprintw(y++, x,"       NNNNNNNNNXo.                  .. ........ ;KWNNNNXXXXXNNNNNNNNNNXXXXXXNWk.                          ");
+        //printem o score estilisado se quiserem tbm;
+        mvprintw(maxY-2, -70+maxX/2,"Fim de Jogo! Infelizmente, não foi possível provar suas habilidades...");
         getch();
+        sleep(10);    
     }
-    sleep(1);
+    
     return score;
 }
 
