@@ -53,7 +53,7 @@ int Y,int X){
         }
     }
     if((*waveNum == 2) && *enemy_amount == 0){
-        if(*smallW=1){
+        if(*smallW==1){
 
         }
     }
@@ -67,7 +67,7 @@ void write_your_initials(char *destino){
     char c;
     move(2,2);
     while((c = getch())!='\n'){
-        if(isalnum(c) || c == ' '){
+        if(isalnum(c)){
             refresh();
             addch(c);
             *pa = c;
