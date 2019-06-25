@@ -1,4 +1,11 @@
 /*//===========================================================================//
+André 11-13/6/19
+Gênesis 1:3    
+Disse André: "Haja luz", e houve luz.
+criada toda a estrutura básica do ncurses (até então toda na mesma janela),
+além de cores, controles do jogador, inimigos e tiros
+*///===========================================================================//
+/*//===========================================================================//
 João 14/6/19:
 removi altura e largura, cada janela terá altura e largura especificas
 jogadores agora são inicializados como ponteiros player1 e player2
