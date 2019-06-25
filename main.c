@@ -7,19 +7,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <ctype.h>
 #include <string.h>
 #define ENEMYTYPE0MAX 15
 #define ENEMYTYPE1MAX 15
 #define ENEMYTYPE2MAX 15
 #define ENEMYTYPE3MAX 0
-#define DISTANCIA_INIMIGOS 2
 #define MAX_SHOTS 20//shots
 
 #include "time_elapsed.h"//declare this before anything else
 #include "player.h"
 #include "enemy.h"
 #include "jogo.h"
-#include "start.h"
 
 typedef struct _PLAYER_SCORE{
     int score;
@@ -122,7 +121,7 @@ int main() {
                     FILE *parq1;
                     parq1 = fopen("score.txt","r");
                     for(int i=0;i<10;i++){
-                        fscanf(parq1,"%d %[A-Z a-z]\n",&score_player[i].score,score_player[i].name);
+                        fscanf(parq1,"%d %s\n",&score_player[i].score,score_player[i].name);
                     }
                     fclose(parq1);
                     strcpy(score_player[10].name,recent_score.name);
@@ -144,7 +143,7 @@ int main() {
                     FILE *parq2;
                     parq2 = fopen("score.txt","r");
                     while(!feof(parq2)){
-                        fscanf(parq2,"%d %s\n",&scoreName,name);
+                        fscanf(parq2,"%d %[A-Z a-z]\n",&scoreName,name);
                         mvprintw(2+k,30,"%d",scoreName);
                         mvprintw(2+k,2,"%s",name);
                         k++;
