@@ -19,6 +19,7 @@
 #include "player.h"
 #include "enemy.h"
 #include "jogo.h"
+#include "start.h"
 
 typedef struct _PLAYER_SCORE{
     int score;
@@ -44,7 +45,7 @@ void organize_score(pontuacao pts[]){//organize score from biggest to smallest
 
 int main() {
     WINDOW *w;
-    char list[6][100] = { "SELECIONE USANDO AS TECLAS W-S", "Jogar", "Score", "Créditos", "Sair"};
+    char list[6][100] = { "SELECIONE USANDO AS TECLAS W-S; ENTER PARA CONFIRMAR", "Jogar", "Score", "Créditos", "Sair"};
     //char item[7];
     int ch, i = 0;
 
@@ -53,19 +54,28 @@ int main() {
     cbreak();
     int maxY,maxX;
     getmaxyx(stdscr,maxY,maxX);//maxY is the height of stdscr
-    w = newwin( 10, maxX-1, 1, 1 ); // create a new window
+    w = newwin( 7, maxX-1, maxY-10, 1 ); // create a new window
     box( w, 0, 0 ); // sets default borders for the window
-    
+
      
     //now print all the menu items and highlight the first one
     for( i=0; i<5; i++ ) {
         if( i == 1 ) 
             wattron( w, A_STANDOUT ); // highlights the first item.
+        
+        //sprintf(item, "%-6s",  list[i]);
         mvwprintw( w, i+1, 2, "%s", list[i] );
         wattroff( w, A_STANDOUT );
     }
+    mvprintw((maxY/4), -27+maxX/2, "  ____                      __        __              ");
+    mvprintw((maxY/4)+1, -27+maxX/2, " / ___| _   _ _ __   ___ _ _\\ \\      / /_ ___   _____ ");
+    mvprintw((maxY/4)+2, -27+maxX/2, " \\___ \\| | | | '_ \\ / _ \\ '__\\ \\ /\\ / / _` \\ \\ / / _ \\");
+    mvprintw((maxY/4)+3, -27+maxX/2, "  ___) | |_| | |_) |  __/ |   \\ V    / (_| |\\ V /  __/");
+    mvprintw((maxY/4)+4, -27+maxX/2, " |____/ \\__,_| .__/ \\___|_|    \\_/\\_/ \\__,_| \\_/ \\___|");
+    mvprintw((maxY/4)+5, -27+maxX/2, "             |_|                                      ");
  
-    wrefresh( w ); // update the terminal screen
+    refresh();
+    wrefresh( w ); // update the terminal screen (standard and *w)
  
     i = 1;
     keypad(w,TRUE); // enable keyboard input for the window,allow keyboard arrows.
@@ -77,9 +87,10 @@ int main() {
     recent_score.score = 0;
 
     // get the input
-    do{ 
+    do{
         ch=wgetch(w);//get ch
         //// right pad with spaces to make the items appear with even width.
+        //sprintf(item, "%-6s",  list[i]); 
         mvwprintw(w,i+1,2,"%s",list[i]);
         box(w,0,0); 
         ////use ch to increase or decrease the value i based on the input.
@@ -102,8 +113,11 @@ int main() {
                     clear();//will clear the window stdscr after refresh
                     refresh();//will refresh to apply clear()
                     curs_set(1);
+                    getch();
                     write_your_initials(recent_score.name);
                     curs_set(0);
+                    clear();
+                    refresh();
                     recent_score.score = game();
                     FILE *parq1;
                     parq1 = fopen("score.txt","r");
@@ -143,10 +157,14 @@ int main() {
                 case 3:
                     clear();
                     refresh();
-                    mvprintw(1+maxY/2,4,"João Henrique Schmidt");
-                    mvprintw(-1+maxY/2,4,"André Uziel");
-                    mvprintw(-3+maxY/2,4,"Thalles Nonato");
-                    mvprintw(+3+maxY/2,4,"Diego Malta");
+                    mvprintw(5,-5+maxX/2, "CREDITOS");
+                    mvprintw(-6+maxY/2,-7+maxX/2, "Desenvolvedores:");
+                    mvprintw(1+maxY/2,-5+maxX/2,"-João Henrique Schmidt");
+                    mvprintw(-1+maxY/2,-5+maxX/2,"-Diego Malta");
+                    mvprintw(-3+maxY/2,-5+maxX/2,"-André Uziel");
+                    mvprintw(+3+maxY/2,-5+maxX/2,"-Thalles Nonato");
+                    mvprintw(7+maxY/2, -15+maxX/2, "Agradecimentos Especiais: hugonobrega.com");
+                    mvprintw(9+maxY/2, -21+maxX/2, "Todos os direitos de imagem foram devidamente obtidos");
                     getch();//has refresh "inside" of it, therefore will refresh
                     clear();
                     refresh();
@@ -159,6 +177,7 @@ int main() {
         }
         ////now highlight the next item in the list.
         wattron( w, A_STANDOUT );
+        //sprintf(item, "%-6s",  list[i]);
         mvwprintw( w, i+1, 2, "%s", list[i]);
         wattroff( w, A_STANDOUT );
     }while(ch!=27);
