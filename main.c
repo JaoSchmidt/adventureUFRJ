@@ -12,19 +12,18 @@
 #define ENEMYTYPE0MAX 15
 #define ENEMYTYPE1MAX 15
 #define ENEMYTYPE2MAX 15
-#define ENEMYTYPE3MAX 0
 #define MAX_SHOTS 20//shots
-
+ 
 #include "time_elapsed.h"//declare this before anything else
 #include "player.h"
 #include "enemy.h"
 #include "jogo.h"
-
+ 
 typedef struct _PLAYER_SCORE{
     int score;
     char name[50];
 } pontuacao;
-
+ 
 void organize_score(pontuacao pts[]){//organize score from biggest to smallest
     char temp_char[50];
     int temp_int;
@@ -41,13 +40,13 @@ void organize_score(pontuacao pts[]){//organize score from biggest to smallest
         }
     }
 }
-
+ 
 int main() {
     WINDOW *w;
     char list[6][100] = { "SELECIONE USANDO AS TECLAS W-S; ENTER PARA CONFIRMAR", "Jogar", "Score", "Créditos", "Sair"};
     //char item[7];
     int ch, i = 0;
-
+ 
     initscr(); // initialize Ncurses
     noecho(); // disable echoing of characters on the screen
     cbreak();
@@ -55,23 +54,28 @@ int main() {
     getmaxyx(stdscr,maxY,maxX);//maxY is the height of stdscr
     w = newwin( 7, maxX-1, maxY-10, 1 ); // create a new window
     box( w, 0, 0 ); // sets default borders for the window
-
+ 
      
     //now print all the menu items and highlight the first one
     for( i=0; i<5; i++ ) {
-        if( i == 1 ) 
+        if( i == 1 )
             wattron( w, A_STANDOUT ); // highlights the first item.
-        
+       
         //sprintf(item, "%-6s",  list[i]);
         mvwprintw( w, i+1, 2, "%s", list[i] );
         wattroff( w, A_STANDOUT );
     }
-    mvprintw((maxY/4)+0, -27+maxX/2, "  ____                      __        __              ");
-    mvprintw((maxY/4)+1, -27+maxX/2, " / ___| _   _ _ __   ___ _ _\\ \\      / /_ ___   _____ ");
-    mvprintw((maxY/4)+2, -27+maxX/2, " \\___ \\| | | | '_ \\ / _ \\ '__\\ \\ /\\ / / _` \\ \\ / / _ \\");
-    mvprintw((maxY/4)+3, -27+maxX/2, "  ___) | |_| | |_) |  __/ |   \\ V    / (_| |\\ V /  __/");
-    mvprintw((maxY/4)+4, -27+maxX/2, " |____/ \\__,_| .__/ \\___|_|    \\_/\\_/ \\__,_| \\_/ \\___|");
-    mvprintw((maxY/4)+5, -27+maxX/2, "             |_|                                      ");
+    use_default_colors();//allow default background color with -1
+    start_color();
+    init_pair(2,COLOR_BLUE,-1);
+    wattron(stdscr,COLOR_PAIR(2));
+    mvprintw((maxY/4)+0, -27+maxX/2, "   ____      _       _     __        __              ");
+    mvprintw((maxY/4)+1, -27+maxX/2, "  / ___|_ __(_)_ __ | |_ __\\ \\      / /_ ___   _____ ");
+    mvprintw((maxY/4)+2, -27+maxX/2, " | |   | '__| | '_ \\| __/ _ \\ \\ /\\ / / _` \\ \\ / / _ \\");
+    mvprintw((maxY/4)+3, -27+maxX/2, " | |___| |  | | |_) | || (_) \\ V  V / (_| |\\ V /  __/");
+    mvprintw((maxY/4)+4, -27+maxX/2, "  \\____|_|  |_| .__/ \\__\\___/ \\_/\\_/ \\__,_| \\_/ \\___|");
+    mvprintw((maxY/4)+5, -27+maxX/2, "              |_|                                    ");
+    wattroff(stdscr,COLOR_PAIR(2));
  
     refresh();
     wrefresh( w ); // update the terminal screen (standard and *w)
@@ -79,19 +83,30 @@ int main() {
     i = 1;
     keypad(w,TRUE); // enable keyboard input for the window,allow keyboard arrows.
     curs_set(0); // hide the default screen cursor.
-
+ 
     //score data: name and score of player
     pontuacao score_player[11],recent_score;//score_player[10] will be the recent player
     strcpy(recent_score.name,"None");
     recent_score.score = 0;
-
+ 
     // get the input
     do{
+        init_pair(2,COLOR_BLUE,-1);
+        wattron(stdscr,COLOR_PAIR(2));
+        mvprintw((maxY/4)+0, -27+maxX/2, "   ____      _       _     __        __              ");
+        mvprintw((maxY/4)+1, -27+maxX/2, "  / ___|_ __(_)_ __ | |_ __\\ \\      / /_ ___   _____ ");
+        mvprintw((maxY/4)+2, -27+maxX/2, " | |   | '__| | '_ \\| __/ _ \\ \\ /\\ / / _` \\ \\ / / _ \\");
+        mvprintw((maxY/4)+3, -27+maxX/2, " | |___| |  | | |_) | || (_) \\ V  V / (_| |\\ V /  __/");
+        mvprintw((maxY/4)+4, -27+maxX/2, "  \\____|_|  |_| .__/ \\__\\___/ \\_/\\_/ \\__,_| \\_/ \\___|");
+        mvprintw((maxY/4)+5, -27+maxX/2, "              |_|                                    ");
+        wattroff(stdscr,COLOR_PAIR(2));
+        refresh();
+        wrefresh( w );
         ch=wgetch(w);//get ch
         //// right pad with spaces to make the items appear with even width.
-        //sprintf(item, "%-6s",  list[i]); 
+        //sprintf(item, "%-6s",  list[i]);
         mvwprintw(w,i+1,2,"%s",list[i]);
-        box(w,0,0); 
+        box(w,0,0);
         ////use ch to increase or decrease the value i based on the input.
         switch(ch) {
             case 'w':
@@ -112,7 +127,6 @@ int main() {
                     clear();//will clear the window stdscr after refresh
                     refresh();//will refresh to apply clear()
                     curs_set(1);
-                    getch();
                     write_your_initials(recent_score.name);
                     curs_set(0);
                     clear();
@@ -139,13 +153,25 @@ int main() {
                     clear();
                     refresh();
                     int k=0,scoreName;
-                    char name[4];
+                    char name[50];
                     FILE *parq2;
                     parq2 = fopen("score.txt","r");
                     while(!feof(parq2)){
                         fscanf(parq2,"%d %[A-Z a-z]\n",&scoreName,name);
-                        mvprintw(2+k,30,"%d",scoreName);
-                        mvprintw(2+k,2,"%s",name);
+                        start_color();
+                        init_pair(1,COLOR_GREEN,-1);                        
+                        wattron(stdscr,COLOR_PAIR(1));
+                        mvprintw( 3, -45+maxX/2, "         _________ _______           _______  _______  _______  _______  _______  _______");
+                        mvprintw( 4, -45+maxX/2,"|\\     /|\\__   __/(  ____ \\|\\     /|(  ____ \\(  ____ \\(  ___  )(  ____ )(  ____ \\(  ____ \\   ");
+                        mvprintw( 5, -45+maxX/2,"| )   ( |   ) (   | (    \\/| )   ( || (    \\/| (    \\/| (   ) || (    )|| (    \\/| (    \\/ _ ");
+                        mvprintw( 6, -45+maxX/2,"| (___) |   | |   | |      | (___) || (_____ | |      | |   | || (____)|| (__    | (_____ (_)");
+                        mvprintw( 7, -45+maxX/2,"|  ___  |   | |   | | ____ |  ___  |(_____  )| |      | |   | ||     __)|  __)   (_____  )   ");
+                        mvprintw( 8, -45+maxX/2,"| (   ) |   | |   | | \\_  )| (   ) |      ) || |      | |   | || (\\ (   | (            ) | _ ");
+                        mvprintw( 9, -45+maxX/2,"| )   ( |___) (___| (___) || )   ( |/\\____) || (____/\\| (___) || ) \\ \\__| (____/\\/\\____) |(_)");
+                        mvprintw( 10, -45+maxX/2,"|/     \\|\\_______/(_______)|/     \\|\\_______)(_______/(_______)|/   \\__/(_______/\\_______)   ");
+                        mvprintw(15+k,85,"%d",scoreName);
+                        mvprintw(15+k,65,"%s",name);
+                        wattroff(stdscr, COLOR_PAIR(1));
                         k++;
                     }
                     getch();
@@ -167,7 +193,7 @@ int main() {
                     getch();//has refresh "inside" of it, therefore will refresh
                     clear();
                     refresh();
-	                break;
+                    break;
                 case 4:
                     ch = 27;
                     break;
