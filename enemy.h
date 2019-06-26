@@ -106,7 +106,7 @@ void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,int maxY,int maxX,
                     }
                     wrefresh(stats);
                     *enemy_number-=1;
-                    mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
+                    mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
                 }
             }
         }
@@ -137,7 +137,7 @@ void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,int maxY,int maxX,in
                     }
                     wrefresh(stats);
                     *enemy_number-=1;
-                    mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
+                    mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
                 }
             }
         }
@@ -169,7 +169,7 @@ void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
-            mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
+            mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
         }
     }
 }
@@ -200,7 +200,7 @@ void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
-            mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
+            mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
         }
     }
 }
