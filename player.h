@@ -1,12 +1,12 @@
 #ifndef PLAYER_HEADER
 #define PLAYER_HEADER
-
+ 
 typedef struct _TIROS{//shot struct
     WINDOW *curWin;
     int vivo,locx,locy;
     int direcaotiro;
 } tiro;
-
+ 
 tiro * inicializa_tiro(WINDOW *win){
     tiro *t = (tiro*) malloc(sizeof(tiro));
     t->curWin = win;
@@ -16,7 +16,7 @@ tiro * inicializa_tiro(WINDOW *win){
     t->direcaotiro = '>';
     return t;
 }
-
+ 
 typedef struct _JOGADOR{ //estrutura para jogador
     WINDOW *curWin;
     int locX,locY,maxX,maxY;//player coord //maximum coordinate
@@ -24,23 +24,23 @@ typedef struct _JOGADOR{ //estrutura para jogador
     int vida; //alive or not
     int qtiros;
 } jogador;
-
-
+ 
+ 
 jogador *inicializajogador(WINDOW *win,int y,int x)//initialize with specificated coordinates
 {
     jogador *p = (jogador*) malloc(sizeof(jogador));
     p->curWin = win;
     p->locX=x;p->locY=y;
     p->direcao='>';
-    p->vida=10;
+    p->vida=5;
     p->qtiros=0;
     // (*p).vivo = 1;
     //this function write the curWin limits on maxX and maxY
     getmaxyx(p->curWin,p->maxY,p->maxX);
     return p;
 }
-
-
+ 
+ 
 void adciona_tiro_ao_jogador(jogador *p,tiro *t){
     p->qtiros++;
     t->curWin=p->curWin;
@@ -49,7 +49,7 @@ void adciona_tiro_ao_jogador(jogador *p,tiro *t){
     case '^':
         t->direcaotiro = '^';
         t->locx=p->locX+1;//those 2 make the shots appear on the player coord
-        t->locy=p->locY;//the small variations on locY and locX are to make the shots appear in the right position 
+        t->locy=p->locY;//the small variations on locY and locX are to make the shots appear in the right position
         break;
     case '<':
         t->direcaotiro = '<';
@@ -116,10 +116,10 @@ void movDown(jogador *p1){
         p1->locY++;
         p1->direcao = 'v';
     }
-    
+   
 }
-
-
+ 
+ 
 void desenhaplayer(jogador *p,int num){ //draw the player on terminal
     mvwprintw(p->curWin,p->locY,p->locX,"\\%d/",num); //print the keys that follow the player
     switch (p->direcao)
@@ -141,7 +141,7 @@ void desenhaplayer(jogador *p,int num){ //draw the player on terminal
     }
     return;
 }
-
+ 
 int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the controler for player1
     int choice = wgetch(p->curWin);
     switch (choice)
@@ -155,7 +155,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
         break;
     case '4':
     case 'a':
-        if(time_elapsed(tandar,0.06)) 
+        if(time_elapsed(tandar,0.06))
             movLeft(p);
         break;
     case '5':
@@ -183,7 +183,7 @@ int controle(jogador *p,float *tatirar,float *tandar,tiro *t[]){ //here is the c
     }
     return choice;
 }
-
+ 
 void desenhatiroY(tiro * t[],jogador *p){//draw shots on terminal
     int cont;
     for(cont=0;cont<MAX_SHOTS;cont++){//MAX_SHOTS is number of shots defined in main
@@ -216,7 +216,7 @@ void desenhatiroX(tiro * t[],jogador *p){//draw shots on terminal
         }
     }
 }
-void colisao_tiro(tiro *t[],int maxY,int maxX){ 
+void colisao_tiro(tiro *t[],int maxY,int maxX){
     int cont;
     for(cont=0;cont<MAX_SHOTS;cont++){
         if(t[cont]->locx<0||t[cont]->locx>maxX||t[cont]->locy<0||t[cont]->locy>maxY){
@@ -225,6 +225,6 @@ void colisao_tiro(tiro *t[],int maxY,int maxX){
         }
     }
 }
-
-
+ 
+ 
 #endif
