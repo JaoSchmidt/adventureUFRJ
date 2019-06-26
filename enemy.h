@@ -38,7 +38,7 @@ void controle_inimigo0(inimigo *i,jogador *p){
     }
 }
 
-void controle_inimigo_1(inimigo *i,jogador *p){
+void controle_inimigo_2(inimigo *i,jogador *p){
     if(i->vivo==1){
         mvwaddch(p->curWin,i->y-1,i->x,' ');
         mvwaddch(p->curWin,i->y,i->x,' ');
@@ -63,7 +63,7 @@ void controle_inimigo_1(inimigo *i,jogador *p){
     }
 }
 
-void controle_inimigo_2(inimigo *i,jogador *p){
+void controle_inimigo_1(inimigo *i,jogador *p){
     if(i->vivo==1){
         mvwprintw(p->curWin,i->y,i->x,"   ");
         if(i->y>p->locY){
@@ -84,7 +84,7 @@ void controle_inimigo_2(inimigo *i,jogador *p){
     }
 }
 ////COLISION ENEMY WITH SHOTS
-void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,int maxX,int *enemy_number,WINDOW *stats){ 
+void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,int maxY,int maxX,int *enemy_number,WINDOW *stats){ 
     if(i->vivo==1){
         int cont;
         for(cont=0;cont<MAX_SHOTS;cont++){
@@ -93,7 +93,9 @@ void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,jogador *p,int max
                     t[cont]->vivo=0;
                     i->vivo=0;
                     mvwprintw(t[cont]->curWin,i->y,i->x,"   ");
-                    //STATS MODIFICATION
+                    //STATS WINDOW MODIFICATION
+                    int maxx,maxy;
+                    getmaxyx(stats,maxy,maxx);
                     *score+=3;
                     if(*score<0){
                         *score = -*score;
@@ -104,24 +106,27 @@ void colisao_tiro_inimigo_0e1(tiro *t[],inimigo *i,int *score,jogador *p,int max
                     }
                     wrefresh(stats);
                     *enemy_number-=1;
+                    mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
                 }
             }
         }
     }
 }
 
-void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,int maxX,int *enemy_number,WINDOW*stats){ 
+void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,int maxY,int maxX,int *enemy_number,WINDOW*stats){ 
     if(i->vivo==1){
         int cont;
         for(cont=0;cont<MAX_SHOTS;cont++){
             if(t[cont]->vivo==1){
                 if(t[cont]->locx==i->x && t[cont]->locy==i->y){
-                    mvwaddch(t[cont]->curWin,i->y,i->x,' ');
+                    mvwaddch(t[cont]->curWin,i->y+0,i->x,' ');
                     mvwaddch(t[cont]->curWin,i->y-1,i->x,' ');
                     mvwaddch(t[cont]->curWin,i->y+1,i->x,' ');
                     t[cont]->vivo=0;
                     i->vivo=0;
-                    //STATS MODIFICATION
+                    //STATS WINDOW MODIFICATION
+                    int maxx,maxy;
+                    getmaxyx(stats,maxy,maxx);
                     *score+=3;
                     if(*score<0){
                         *score = -*score;
@@ -132,6 +137,7 @@ void colisao_tiro_inimigo_2(tiro *t[],inimigo *i,int *score,jogador *p,int maxY,
                     }
                     wrefresh(stats);
                     *enemy_number-=1;
+                    mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
                 }
             }
         }
@@ -142,10 +148,11 @@ void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,
     if(icolisao->vivo==1){
         if((icolisao->x+1==pcolisao->locX+1)&&icolisao->y == pcolisao->locY){
             icolisao->vivo=0;
-            int maxy = getmaxy(stats);
             mvwprintw(pcolisao->curWin,icolisao->y,icolisao->x,"   ");
             pcolisao->vida--;
-            //STATS MODIFICATION
+            //STATS WINDOW MODIFICATION
+            int maxx,maxy;
+            getmaxyx(stats,maxy,maxx);
             *score-=10;
             if(*score<0){
                 *score = -*score;
@@ -162,17 +169,21 @@ void colisao_player_inimigos_0e1(jogador *pcolisao,inimigo *icolisao,int *score,
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
+            mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
         }
     }
 }
 void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int *enemy_number,WINDOW *stats,int *pc){
     if(icolisao->vivo==1){
-        if(icolisao->x==pcolisao->locX+1&&icolisao->y == pcolisao->locY){
+        if(icolisao->x==pcolisao->locX&&icolisao->y == pcolisao->locY){
             icolisao->vivo=0;
-            int maxy = getmaxy(stats);
-            mvwprintw(pcolisao->curWin,icolisao->y,icolisao->x,"   ");
+            mvwaddch(pcolisao->curWin,icolisao->y+0,icolisao->x,' ');
             mvwaddch(pcolisao->curWin,icolisao->y-1,icolisao->x,' ');
             mvwaddch(pcolisao->curWin,icolisao->y+1,icolisao->x,' ');
+            pcolisao->vida--;
+            //STATS WINDOW MODIFICATION
+            int maxy, maxx;
+            getmaxyx(stats,maxy,maxx);
             *score-=10;
             if(*score<0){
                 *score = -*score;
@@ -181,15 +192,15 @@ void colisao_player_inimigos2(jogador *pcolisao,inimigo *icolisao,int *score,int
             }else{
                 mvwprintw(stats,maxy/2-1,8," %d%d%d%d",((*score)/1000)%10,((*score)/100)%10,((*score)/10)%10,(*score)%10);
             }
-            pcolisao->vida--;
             mvwprintw(stats,maxy/2+1,8+pcolisao->vida," ");
             if(pcolisao->vida == 9)
                 mvwprintw(stats,maxy/2+1,21," ");
             if(pcolisao->vida == 0)
-            *pc=112;
+                *pc=112;
             mvwprintw(stats,maxy/2+1,22,"%d",pcolisao->vida);
             wrefresh(stats);
             *enemy_number-=1;
+            mvwprintw(stats,maxy/2+1,maxx/2,"remaning enemies: %d%d",((*enemy_number)/10)%10,(*enemy_number)%10);
         }
     }
 }
