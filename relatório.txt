@@ -51,3 +51,10 @@ tbm colisao entre o inimigo com o tiro e o player, adionado vida, adicionado sco
 adicionado janela de status do jogador, adicionado organizador de pontuação.
 Definidos quantidade máxima de cada um dos inimigos.
 *///===========================================================================//
+
+Diego e Thalles 25/06/19:
+Meu Deus, que aventura! Passamo mal programando as waves. Toda hora cometiamos
+erros pequenos, como esquecer de mudar valores de variáveis e ";". Fizemos a tela
+de vitória, estilizamos a tela de highscore e resolvemos bugs dela. Tiramos o bug
+da tela inicial de parar de mostrar o título depois da primeira vez que o jogo é
+iniciado. Fizemos a terceira, quarta e quinta waves.
