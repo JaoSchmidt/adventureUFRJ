@@ -3,9 +3,9 @@
 #define TIME_ELAPSED_HEADER
 
 struct timespec spec;
-/*This function return false if elapsed time since it was 
-called is smaller than the value of the second parameter 
-in seconds. If value is bigger, returns true and reset 
+/*This function return false if elapsed time since the last 
+time it was true is smaller than the value of the second 
+parameter. If value is bigger, returns true and reset 
 the time elapsed*/
 float time_elapsed(float *tv0,float limit){
     clock_gettime(CLOCK_MONOTONIC, &spec);
