@@ -3,7 +3,7 @@ André 11-13/6/19
 Gênesis 1:3    
 Disse André: "Haja luz", e houve luz.
 criada toda a estrutura básica do ncurses (até então toda na mesma janela),
-além de cores, controles do jogador, inimigos e tiros
+além de cores, controles do jogador, inimigos, tiros, colisões e estruturas
 *///===========================================================================//
 /*//===========================================================================//
 João 14/6/19:
