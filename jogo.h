@@ -3,22 +3,23 @@
 
 void execute_wave(int *waveNum,float *time0,int *smallW,int *enemy_amount,
 inimigo *enemy0[],inimigo *enemy1[],inimigo *enemy2[],inimigo *enemy3[],
-int Y,int X){
+int Y,int X, WINDOW *stats,int maxy,int maxx){
     if(*waveNum == 0){
         if(*smallW==0){
-            enemy1[0] = inicializa_inimigo(1,10,10-0);
-            enemy1[1] = inicializa_inimigo(1,11,10-1);
-            enemy1[2] = inicializa_inimigo(1,12,10-2);
-            enemy1[3] = inicializa_inimigo(1,13,10-3);
-            enemy1[4] = inicializa_inimigo(1,14,10-4);
-            enemy2[0] = inicializa_inimigo(1,20,10);
-            enemy2[1] = inicializa_inimigo(1,21,11);
-            enemy2[2] = inicializa_inimigo(1,22,12);
-            enemy2[3] = inicializa_inimigo(1,23,13);
-            enemy2[4] = inicializa_inimigo(1,24,14);
+            enemy1[0] = inicializa_inimigo(1,10+0,10-2*0);
+            enemy1[1] = inicializa_inimigo(1,10+1,10-2*1);
+            enemy1[2] = inicializa_inimigo(1,10+2,10-2*2);
+            enemy1[3] = inicializa_inimigo(1,10+3,10-2*3);
+            enemy1[4] = inicializa_inimigo(1,10+4,10-2*4);
+            enemy2[0] = inicializa_inimigo(1,20-3*0,10);
+            enemy2[1] = inicializa_inimigo(1,20-3*1,11);
+            enemy2[2] = inicializa_inimigo(1,20-3*2,12);
+            enemy2[3] = inicializa_inimigo(1,20-3*3,13);
+            enemy2[4] = inicializa_inimigo(1,20-3*4,14);
             *enemy_amount+=10;
             *smallW = 1;
-            
+            mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_amount)/10)%10,(*enemy_amount)%10);
+            wrefresh(stats);
         }
         if(time_elapsed(time0,2)&&(*smallW==1)){
             enemy0[0] = inicializa_inimigo(1,Y/2+0,X/2+0);
@@ -29,7 +30,8 @@ int Y,int X){
             *enemy_amount+=5;
             *smallW = 0;
             *waveNum = 1;
-
+            mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_amount)/10)%10,(*enemy_amount)%10);
+            wrefresh(stats);
         }
     }
     if((*waveNum == 1) && *enemy_amount == 0){
@@ -50,6 +52,8 @@ int Y,int X){
             *enemy_amount+=13;
             *smallW=1;
             *waveNum = 2;
+            mvwprintw(stats,maxy/2+1,maxx/2,"Enemies alive: %d%d",((*enemy_amount)/10)%10,(*enemy_amount)%10);
+            wrefresh(stats);
         }
     }
     if((*waveNum == 2) && *enemy_amount == 0){
@@ -62,6 +66,7 @@ int Y,int X){
 
 void write_your_initials(char *destino){
     mvprintw(1,2,"Escreva o nome do jogador\n");
+    refresh();
     char a[50],*pa;
     pa = a;
     char c;
@@ -120,6 +125,7 @@ int game(){
     desenhaplayer(player1,1);
     mvwprintw(statsWin,stat_maxy/2+1,2,"Vida [==========]  %d",player1->vida);
     mvwprintw(statsWin,stat_maxy/2-1,2,"Score: 0");
+    mvwprintw(statsWin,stat_maxy/2+1,stat_maxx/2,"Enemies alive: 10");
 
     
     wrefresh(statsWin);
@@ -161,7 +167,7 @@ int game(){
     wtimeout(playerWin,1);
     do{//time loop, as time passes, the game run
         c = controle(player1,&controle_tiro,&controle_instant,tiros_jogador);
-        execute_wave(&wave_number,&enemy_spawn,&small_wave,&enemy_amount,i0,i1,i2,i3,maxY*15/20,maxX*9/10);//INITATE FIRST WAVE
+        execute_wave(&wave_number,&enemy_spawn,&small_wave,&enemy_amount,i0,i1,i2,i3,maxY*15/20,maxX*9/10,statsWin,stat_maxy,stat_maxx);//INITATE FIRST WAVE
         ////PLAYER MOVMENT
         wattron(playerWin,COLOR_PAIR(2));
         desenhaplayer(player1,1);
@@ -193,15 +199,15 @@ int game(){
         wattroff(playerWin,COLOR_PAIR(4));
         //SHOTS AND PLAYER COLISION
         for(cont=0;cont<ENEMYTYPE0MAX;cont++){
-            colisao_tiro_inimigo_0e1(tiros_jogador,i0[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
+            colisao_tiro_inimigo_0e1(tiros_jogador,i0[cont],&score,maxY,maxX,&enemy_amount,statsWin);
             colisao_player_inimigos_0e1(player1,i0[cont],&score,&enemy_amount,statsWin,&c);
         }
         for(cont=0;cont<ENEMYTYPE1MAX;cont++){
-            colisao_tiro_inimigo_0e1(tiros_jogador,i1[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
+            colisao_tiro_inimigo_0e1(tiros_jogador,i1[cont],&score,maxY,maxX,&enemy_amount,statsWin);
             colisao_player_inimigos_0e1(player1,i1[cont],&score,&enemy_amount,statsWin,&c);
         }
         for(cont=0;cont<ENEMYTYPE2MAX;cont++){
-            colisao_tiro_inimigo_2(tiros_jogador,i2[cont],&score,player1,maxY,maxX,&enemy_amount,statsWin);
+            colisao_tiro_inimigo_2(tiros_jogador,i2[cont],&score,maxY,maxX,&enemy_amount,statsWin);
             colisao_player_inimigos2(player1,i2[cont],&score,&enemy_amount,statsWin,&c);
         }
     }while(c!='p');
@@ -209,7 +215,6 @@ int game(){
     int y=0, x=0;
     if(player1->vida<=0){
         clear();
-        //printem uma tela de game over maneira na stdscr aqui;
         mvprintw(y++, x,"       XXXXXXXNNNNXXXKXXNXXXXXXXXXNNNNNNNNNNNNNNNWWNNNWWWWWWWWNNWWWWNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
         mvprintw(y++, x,"       XXNNNNNNNNNNNXXXXXXXNNNXXNNNNNNNNNNNNNNNNNNWWNNWNNWN0dlccldOKXNNWNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
         mvprintw(y++, x,"       NNNNNNNNNNNNNNNNNNNNNNNXNNNNNNNNNNNNNNNNNNWWWWNX0xoc'.... ..';lxKNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
@@ -260,10 +265,9 @@ int game(){
         mvprintw(y++, x,"       NNNNNNNNNNNKl.                 .     .... .xNNNNNXXXXXNNNNNNNNNNNNXXXXXN0;                          ");
         mvprintw(y++, x,"       NNNNNNNNNNKc.                 ..  ....... 'OWNNNNXXXXXNNNNNNNNNNNXXXXXNWO'                          ");
         mvprintw(y++, x,"       NNNNNNNNNXo.                  .. ........ ;KWNNNNXXXXXNNNNNNNNNNXXXXXXNWk.                          ");
-        //printem o score estilisado se quiserem tbm;
         mvprintw(maxY-2, -70+maxX/2,"Fim de Jogo! Infelizmente, não foi possível provar suas habilidades...");
         getch();
-        sleep(10);    
+        sleep(4);    
     }
     
     return score;
