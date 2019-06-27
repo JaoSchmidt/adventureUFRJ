@@ -1,4 +1,4 @@
-//COMPILAR: gcc c.c -o c -Wall -lncurses
+//COMPILAR: gcc main.c -o c -Wall -lncurses
 //VERSIONBETA7.5
 //ESSE PROGRAMA NÃO USA VARIÁVEIS GLOBAIS AFIM DE GARANTIR PORTABILIDADE
 #define _POSIX_C_SOURCE 200809L//define o CLOCK_MONOLITIC
@@ -86,7 +86,7 @@ int main() {
  
     //score data: name and score of player
     pontuacao score_player[11],recent_score;//score_player[10] will be the recent player
-    strcpy(recent_score.name,"None");
+    strcpy(recent_score.name,"                    ");
     recent_score.score = 0;
  
     // get the input
