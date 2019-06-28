@@ -320,7 +320,7 @@ int game(){
             colisao_player_inimigos2(player1,i2[cont],&score,&enemy_amount,statsWin,&c);
         }
     }while(c!='p');
-    if(wave_number==5){
+    if(wave_number==5 && enemy_amount==0){
         clear();
         mvprintw(2,-47+maxX/2,"Vitória! Você provou, por absurdo, que é digno de criptografar!");
         refresh();
@@ -328,7 +328,7 @@ int game(){
         getch();
     }
     int y=0, x=0;
-    if(player1->vida<=0){
+    if(player1->vida<=0 && enemy_amount!=0){
         clear();
         
         mvprintw(y++, x,"           XXXXXXXNNNNXXXKXXNXXXXXXXXXNNNNNNNNNNNNNNNWWNNNWWWWWWWWNNWWWWNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
