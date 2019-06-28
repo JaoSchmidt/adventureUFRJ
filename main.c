@@ -67,16 +67,7 @@ int main() {
     }
     use_default_colors();//allow default background color with -1
     start_color();
-    init_pair(2,COLOR_BLUE,-1);
-    wattron(stdscr,COLOR_PAIR(2));
-    mvprintw((maxY/4)+0, -27+maxX/2, "   ____      _       _     __        __              ");
-    mvprintw((maxY/4)+1, -27+maxX/2, "  / ___|_ __(_)_ __ | |_ __\\ \\      / /_ ___   _____ ");
-    mvprintw((maxY/4)+2, -27+maxX/2, " | |   | '__| | '_ \\| __/ _ \\ \\ /\\ / / _` \\ \\ / / _ \\");
-    mvprintw((maxY/4)+3, -27+maxX/2, " | |___| |  | | |_) | || (_) \\ V  V / (_| |\\ V /  __/");
-    mvprintw((maxY/4)+4, -27+maxX/2, "  \\____|_|  |_| .__/ \\__\\___/ \\_/\\_/ \\__,_| \\_/ \\___|");
-    mvprintw((maxY/4)+5, -27+maxX/2, "              |_|                                    ");
-    wattroff(stdscr,COLOR_PAIR(2));
- 
+    
     refresh();
     wrefresh( w ); // update the terminal screen (standard and *w)
  
@@ -91,6 +82,7 @@ int main() {
  
     // get the input
     do{
+        attron(A_BOLD);
         init_pair(2,COLOR_BLUE,-1);
         wattron(stdscr,COLOR_PAIR(2));
         mvprintw((maxY/4)+0, -27+maxX/2, "   ____      _       _     __        __              ");
@@ -100,6 +92,7 @@ int main() {
         mvprintw((maxY/4)+4, -27+maxX/2, "  \\____|_|  |_| .__/ \\__\\___/ \\_/\\_/ \\__,_| \\_/ \\___|");
         mvprintw((maxY/4)+5, -27+maxX/2, "              |_|                                    ");
         wattroff(stdscr,COLOR_PAIR(2));
+        attroff(A_BOLD);
         refresh();
         wrefresh( w );
         ch=wgetch(w);//get ch
@@ -161,6 +154,7 @@ int main() {
                         start_color();
                         init_pair(1,COLOR_GREEN,-1);                        
                         wattron(stdscr,COLOR_PAIR(1));
+                        attron(A_BOLD);
                         mvprintw( 3, -45+maxX/2, "         _________ _______           _______  _______  _______  _______  _______  _______");
                         mvprintw( 4, -45+maxX/2,"|\\     /|\\__   __/(  ____ \\|\\     /|(  ____ \\(  ____ \\(  ___  )(  ____ )(  ____ \\(  ____ \\   ");
                         mvprintw( 5, -45+maxX/2,"| )   ( |   ) (   | (    \\/| )   ( || (    \\/| (    \\/| (   ) || (    )|| (    \\/| (    \\/ _ ");
@@ -172,6 +166,7 @@ int main() {
                         mvprintw(15+k,85,"%d",scoreName);
                         mvprintw(15+k,65,"%s",name);
                         wattroff(stdscr, COLOR_PAIR(1));
+                        attron(A_BOLD);
                         k++;
                     }
                     getch();
