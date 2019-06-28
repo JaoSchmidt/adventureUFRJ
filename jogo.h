@@ -6,11 +6,11 @@ inimigo *enemy0[],inimigo *enemy1[],inimigo *enemy2[],
 int Y,int X, WINDOW *stats,int maxy,int maxx,int *pc){
     if(*waveNum == 0){
         if(*smallW==0){
-            enemy1[0] = inicializa_inimigo(1,10+0,10-2*0);
-            enemy1[1] = inicializa_inimigo(1,10+1,10-2*1);
-            enemy1[2] = inicializa_inimigo(1,10+2,10-2*2);
-            enemy1[3] = inicializa_inimigo(1,10+3,10-2*3);
-            enemy1[4] = inicializa_inimigo(1,10+4,10-2*4);
+            enemy1[0] = inicializa_inimigo(1,10,10);
+            enemy1[1] = inicializa_inimigo(1,10+2,10-2*1);
+            enemy1[2] = inicializa_inimigo(1,10+4,10-2*2);
+            enemy1[3] = inicializa_inimigo(1,10+6,10-2*3);
+            enemy1[4] = inicializa_inimigo(1,10+8,10-2*4);
             enemy2[0] = inicializa_inimigo(1,20-3*0,10);
             enemy2[1] = inicializa_inimigo(1,20-3*1,11);
             enemy2[2] = inicializa_inimigo(1,20-3*2,12);
@@ -176,20 +176,22 @@ int Y,int X, WINDOW *stats,int maxy,int maxx,int *pc){
  
  
 void write_your_initials(char *destino){
-    mvprintw(1,2,"Olá! O hugonobrega.com está em apuros! Quem irá tentar salvá-lo? (Pressione 'p' para voltar durante o jogo)\n");
+    mvprintw(1,2,"Ajude! O Hugo Nobrega está em apuros! Quem irá tentar salvá-lo? (Pressione 'p' para voltar durante o jogo)\n");
     refresh();
+    int j=0;
     char a[50],*pa;
     pa = a;
     char c;
     move(2,2);
     while((c = getch())!='\n'){
-        if(isalnum(c)){
+        if(isalnum(c)&&j<20){
             refresh();
             addch(c);
             *pa = c;
             *destino = *pa;
             destino++;
             pa++;
+            j++;
         }
     }
 }
@@ -320,14 +322,15 @@ int game(){
     }while(c!='p');
     if(wave_number==5){
         clear();
-        mvprintw(-47+maxY/2,-47+maxX/2,"Vitória! Você provou, por absurdo, que é digno de criptografar!");
+        mvprintw(2,-47+maxX/2,"Vitória! Você provou, por absurdo, que é digno de criptografar!");
         refresh();
-        sleep(2);
+        sleep(3);
+        getch();
     }
     int y=0, x=0;
     if(player1->vida<=0){
         clear();
- 
+        
         mvprintw(y++, x,"           XXXXXXXNNNNXXXKXXNXXXXXXXXXNNNNNNNNNNNNNNNWWNNNWWWWWWWWNNWWWWNNNNNNNNNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
         mvprintw(y++, x,"           XXNNNNNNNNNNNXXXXXXXNNNXXNNNNNNNNNNNNNNNNNNWWNNWNNWN0dlccldOKXNNWNNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
         mvprintw(y++, x,"           NNNNNNNNNNNNNNNNNNNNNNNXNNNNNNNNNNNNNNNNNNWWWWNX0xoc'.... ..';lxKNWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
@@ -375,11 +378,11 @@ int game(){
         mvprintw(y++, x,"           NNNNNNNNNNNNNNK:.                        .. .kNNXXXXNNNXNNNNNNNXXXXNNNKKXXk.                         ");
         mvprintw(y++, x,"           NNNNNNNNNNNNNd.                       ...  ;0NNXXXXXNNNNNNNNNNNNNNNNXKXXNo.         . .             ");
         mvprintw(y++, x,"           NNNNNNNNNNNNXc                 .     .... .lXNNNNXXXXNNNNNNNNNNNNNNXXXXNXc           ..             ");
-        mvprintw(y++, x,"           NNNNNNNNNNNKl.                 .     .... .xNNNNNXXXXXNNNNNNNNNNNNXXXXXN0;                          ");
-        mvprintw(y++, x,"           NNNNNNNNNNKc.                 ..  ....... 'OWNNNNXXXXXNNNNNNNNNNNXXXXXNWO'                          ");
-        mvprintw(y++, x,"           NNNNNNNNNXo.                  .. ........ ;KWNNNNXXXXXNNNNNNNNNNXXXXXXNWk.                          ");
-        wattroff(stdscr, COLOR_PAIR(2));
+        wattron(stdscr, COLOR_PAIR(4));
+        attron(A_BOLD);
         mvprintw(maxY-2, -70+maxX/2,"       Fim de Jogo! Infelizmente, não foi possível provar suas habilidades...");
+        attroff(A_BOLD);
+        wattroff(stdscr, COLOR_PAIR(4));
         refresh();
         sleep(4);
         getch();
