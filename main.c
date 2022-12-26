@@ -9,6 +9,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
+#include <locale.h>
 #define ENEMYTYPE0MAX 15
 #define ENEMYTYPE1MAX 15
 #define ENEMYTYPE2MAX 15
@@ -18,7 +19,7 @@
 #include "player.h"
 #include "enemy.h"
 #include "jogo.h"
- 
+
 typedef struct _PLAYER_SCORE{
     int score;
     char name[50];
@@ -42,6 +43,7 @@ void organize_score(pontuacao pts[]){//organize score from biggest to smallest
 }
  
 int main() {
+	 setlocale(LC_ALL, "");
     WINDOW *w;
     char list[6][100] = { "SELECIONE USANDO AS TECLAS W-S; ENTER PARA CONFIRMAR", "Jogar", "Score", "Créditos", "Sair"};
     //char item[7];
